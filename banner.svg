@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07080f"/>
+      <stop offset="100%" stop-color="#0c0d1a"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="fadeL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#07080f" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#07080f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fadeR" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#07080f" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#07080f" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#818cf8" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bg)"/>
+  <rect width="1200" height="400" fill="url(#centerGlow)"/>
+
+  <!-- Font specimen rows — left side, faded -->
+  <!-- Row 1 -->
+  <text x="20" y="72" font-family="Georgia, serif" font-size="28" font-weight="400" fill="rgba(255,255,255,0.07)" letter-spacing="-0.5">Playfair Display</text>
+  <text x="20" y="108" font-family="'Courier New', monospace" font-size="22" font-weight="400" fill="rgba(255,255,255,0.05)" letter-spacing="0">JetBrains Mono</text>
+  <text x="20" y="140" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="rgba(255,255,255,0.06)" letter-spacing="-1">Bebas Neue</text>
+  <text x="20" y="178" font-family="Georgia, serif" font-size="26" font-style="italic" fill="rgba(255,255,255,0.05)">Dancing Script</text>
+  <text x="20" y="212" font-family="Arial Narrow, Arial, sans-serif" font-size="24" font-weight="400" fill="rgba(255,255,255,0.06)" letter-spacing="2">ORBITRON</text>
+  <text x="20" y="248" font-family="Arial, sans-serif" font-size="30" font-weight="300" fill="rgba(255,255,255,0.05)" letter-spacing="-0.5">Inter Light</text>
+  <text x="20" y="282" font-family="Georgia, serif" font-size="27" font-weight="700" fill="rgba(255,255,255,0.06)">Merriweather</text>
+  <text x="20" y="316" font-family="'Courier New', monospace" font-size="20" fill="rgba(255,255,255,0.05)">Source Code Pro</text>
+  <text x="20" y="350" font-family="Arial, sans-serif" font-size="29" font-weight="800" fill="rgba(255,255,255,0.06)" letter-spacing="-1">Montserrat</text>
+  <text x="20" y="384" font-family="Georgia, serif" font-size="24" font-style="italic" fill="rgba(255,255,255,0.05)">Cormorant Garamond</text>
+
+  <!-- Font specimen rows — right side, faded -->
+  <text x="820" y="72" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="rgba(255,255,255,0.06)" letter-spacing="-0.5">Poppins Bold</text>
+  <text x="820" y="108" font-family="Georgia, serif" font-size="26" fill="rgba(255,255,255,0.05)">Lora Serif</text>
+  <text x="820" y="140" font-family="'Courier New', monospace" font-size="21" fill="rgba(255,255,255,0.06)">Fira Code</text>
+  <text x="820" y="178" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="rgba(255,255,255,0.05)" letter-spacing="-1">Space Grotesk</text>
+  <text x="820" y="212" font-family="Georgia, serif" font-size="25" font-style="italic" fill="rgba(255,255,255,0.06)">EB Garamond</text>
+  <text x="820" y="248" font-family="Arial Narrow, Arial, sans-serif" font-size="22" font-weight="400" fill="rgba(255,255,255,0.05)" letter-spacing="3">SYNCOPATE</text>
+  <text x="820" y="282" font-family="Arial, sans-serif" font-size="31" font-weight="300" fill="rgba(255,255,255,0.06)" letter-spacing="-0.5">Raleway Thin</text>
+  <text x="820" y="316" font-family="Georgia, serif" font-size="26" font-weight="700" fill="rgba(255,255,255,0.05)">Bitter Bold</text>
+  <text x="820" y="350" font-family="'Courier New', monospace" font-size="20" fill="rgba(255,255,255,0.06)">IBM Plex Mono</text>
+  <text x="820" y="384" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="rgba(255,255,255,0.05)" letter-spacing="-1">Nunito Sans</text>
+
+  <!-- Fade overlays to blend specimens into center -->
+  <rect x="0" y="0" width="380" height="400" fill="url(#fadeL)"/>
+  <rect x="820" y="0" width="380" height="400" fill="url(#fadeR)"/>
+
+  <!-- Center panel -->
+  <rect x="350" y="80" width="500" height="240" rx="20" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+  <!-- .T logo -->
+  <rect x="400" y="128" width="48" height="48" rx="12" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <circle cx="413" cy="152" r="3.8" fill="white" opacity="0.9"/>
+  <rect x="421" y="138" width="18" height="4" rx="2" fill="white"/>
+  <rect x="428.5" y="138" width="4" height="25" rx="2" fill="white"/>
+
+  <!-- TypeStack wordmark -->
+  <text x="460" y="168" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="36" font-weight="800" letter-spacing="-1.5" fill="white">TypeStack</text>
+
+  <!-- Purple underline -->
+  <rect x="460" y="175" width="218" height="2.5" rx="1.25" fill="url(#purple)" opacity="0.8"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" letter-spacing="0.3" fill="rgba(255,255,255,0.35)" text-anchor="middle">Font &amp; Icon Library for Developers</text>
+
+  <!-- Divider -->
+  <rect x="460" y="228" width="280" height="1" fill="rgba(255,255,255,0.06)"/>
+
+  <!-- Stats row -->
+  <text x="490" y="256" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="0.5">1000+ FONTS</text>
+  <rect x="519" y="246" width="1" height="16" fill="rgba(255,255,255,0.1)"/>
+  <text x="560" y="256" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="0.5">LUCIDE ICONS</text>
+  <rect x="601" y="246" width="1" height="16" fill="rgba(255,255,255,0.1)"/>
+  <text x="645" y="256" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="0.5">FREE TO USE</text>
+  <rect x="689" y="246" width="1" height="16" fill="rgba(255,255,255,0.1)"/>
+  <text x="730" y="256" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="rgba(255,255,255,0.25)" text-anchor="middle" letter-spacing="0.5">NO SIGN-UP</text>
+
+  <!-- CSS snippet -->
+  <rect x="400" y="272" width="400" height="34" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="420" y="293" font-family="'Courier New', Courier, monospace" font-size="11.5" fill="rgba(129,140,248,0.7)">@import</text>
+  <text x="468" y="293" font-family="'Courier New', Courier, monospace" font-size="11.5" fill="rgba(255,255,255,0.3)"> url('fonts.googleapis.com/css2?family=Inter');</text>
+
+  <!-- Bottom accent -->
+  <rect x="0" y="395" width="1200" height="5" fill="url(#purple)" opacity="0.65"/>
+</svg>

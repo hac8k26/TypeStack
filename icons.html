@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeStack — Icon Library</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --radius: 16px;
+            --ring: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #07080f; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+        #bg-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        nav, .stats-bar, .grid, #toast { position: relative; z-index: 1; }
+
+        /* Frosted Sticky Header */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(7,8,15,0.6);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 16px 5%; display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand { font-weight: 600; font-size: 15px; letter-spacing: -0.5px; text-decoration: none; color: #fff; }
+        .controls { display: flex; gap: 10px; align-items: center; }
+        .nav-link {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6);
+            text-decoration: none; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 5px; font-family: 'Inter', sans-serif;
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        input[type="text"] {
+            padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06); outline: none; font-size: 14px;
+            width: 250px; color: #fff; transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="text"]::placeholder { color: rgba(255,255,255,0.3); }
+        input[type="text"]:focus { border-color: rgba(99,102,241,0.6); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+
+        .btn {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06); cursor: pointer; font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,0.75); transition: all 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;
+        }
+        .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+        .btn-primary { background: #fff; color: #0f172a; border-color: #fff; }
+        .btn-primary:hover { background: #e2e8f0; border-color: #e2e8f0; }
+
+        /* Stats bar */
+        .stats-bar {
+            padding: 12px 5%; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03);
+            font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+        .stats-bar strong { color: #fff; font-weight: 600; }
+        .stats-bar .sep { display: none; }
+        @media (min-width: 480px) { .stats-bar .sep { display: inline; } }
+
+        /* Size selector */
+        .size-btns { display: flex; gap: 4px; }
+        .size-btn {
+            padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            background: transparent; cursor: pointer; font-size: 11px; font-weight: 500;
+            color: rgba(255,255,255,0.4); transition: all 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .size-btn.active { background: #fff; color: #0f172a; border-color: #fff; }
+
+        /* Icon Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            padding: 32px 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .icon-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 20px 12px 14px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            cursor: pointer; transition: all 0.2s ease; position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .icon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+        }
+        .icon-card.copied { border-color: rgba(99,102,241,0.6); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+
+        .icon-wrap { display: flex; align-items: center; justify-content: center; color: #e2e8f0; }
+        .icon-name {
+            font-size: 10px; color: rgba(255,255,255,0.4); text-align: center;
+            line-height: 1.4; word-break: break-all; font-weight: 500;
+        }
+
+        /* Copy overlay */
+        .copy-hint {
+            position: absolute; inset: 0; border-radius: 12px;
+            background: rgba(15,23,42,0.9); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; opacity: 0;
+            transition: opacity 0.15s; pointer-events: none;
+        }
+        .icon-card:hover .copy-hint { opacity: 1; }
+
+        /* Empty state */
+        .empty {
+            grid-column: 1 / -1; text-align: center;
+            padding: 80px 20px; color: rgba(255,255,255,0.3);
+        }
+        .empty svg { margin-bottom: 16px; opacity: 0.3; }
+        .empty p { font-size: 14px; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: rgba(15,23,42,0.95); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 12px 24px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.3s ease; pointer-events: none; z-index: 100;
+        }
+        .toast-visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+        @media (max-width: 600px) {
+            .controls input[type="text"] { width: 130px; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; padding: 16px 4%; }
+            .icon-card { padding: 14px 8px 10px; }
+            .stats-bar { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Consent gate -->
+    <div id="consent-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(7,8,15,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:40px 36px;max-width:460px;width:100%;box-shadow:0 32px 64px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.05);font-family:'Inter',sans-serif;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <span style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.4px;font-family:'Plus Jakarta Sans',sans-serif;">Before you continue</span>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);margin:20px 0;"></div>
+            <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.8;margin-bottom:24px;">By using <span style="color:rgba(255,255,255,0.75);font-weight:500;">TypeStack</span> you agree to our <a href="terms.html" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Privacy Policy</a>. We don't collect personal data, use cookies, or require sign-up.</p>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:24px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+                <input type="checkbox" id="consent-check" style="margin-top:1px;width:15px;height:15px;flex-shrink:0;accent-color:#fff;cursor:pointer;">
+                <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.65;">I have read and agree to the Terms of Service and Privacy Policy</span>
+            </label>
+            <button id="consent-btn" disabled onclick="acceptConsent()" style="width:100%;padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.25);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:not-allowed;transition:all 0.25s;letter-spacing:0.1px;">Accept &amp; Continue</button>
+            <p style="text-align:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,0.2);">You can review our policies at any time in the footer</p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('consent-check').addEventListener('change',function(){const b=document.getElementById('consent-btn');if(this.checked){b.disabled=false;b.style.background='#fff';b.style.color='#0f172a';b.style.cursor='pointer';b.style.boxShadow='0 4px 20px rgba(255,255,255,0.1)';}else{b.disabled=true;b.style.background='rgba(255,255,255,0.1)';b.style.color='rgba(255,255,255,0.25)';b.style.cursor='not-allowed';b.style.boxShadow='none';}});
+        function acceptConsent(){localStorage.setItem('ts_consent','1');const o=document.getElementById('consent-overlay');o.style.opacity='0';o.style.transition='opacity 0.4s ease';setTimeout(()=>o.remove(),400);}
+        if(localStorage.getItem('ts_consent')==='1')document.getElementById('consent-overlay').remove();
+    </script>
+
+    <nav>
+        <a href="landing.html" class="brand">TypeStack</a>
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Search icons..." oninput="filterIcons(this.value)">
+            <a href="index.html" class="btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                Fonts
+            </a>
+        </div>
+    </nav>
+
+    <!-- Page title image -->
+    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;padding:32px 5% 0;">
+        <svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="52" height="52" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <circle cx="14" cy="26" r="3.5" fill="white" opacity="0.9"/>
+            <rect x="22" y="14" width="16" height="3.5" rx="1.75" fill="white"/>
+            <rect x="28.25" y="14" width="3.5" height="24" rx="1.75" fill="white"/>
+        </svg>
+        <div>
+            <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.8px;line-height:1;">TypeStack</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;">Icon Library</div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <span><strong id="visibleCount">0</strong> icons</span>
+        <span class="sep">·</span>
+        <span>Lucide Icons</span>
+        <span class="sep">·</span>
+        <div class="size-btns">
+            <button class="size-btn" onclick="setSize(16)" data-size="16">16</button>
+            <button class="size-btn active" onclick="setSize(24)" data-size="24">24</button>
+            <button class="size-btn" onclick="setSize(32)" data-size="32">32</button>
+        </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <script type="module">
+        import { createElement, icons } from 'https://cdn.jsdelivr.net/npm/lucide@0.577.0/+esm';
+
+        let currentSize = 24;
+        let allIconNames = Object.keys(icons).sort();
+
+        const grid = document.getElementById('grid');
+        const toast = document.getElementById('toast');
+        const visibleCount = document.getElementById('visibleCount');
+
+        function toKebab(name) {
+            return name.replace(/([A-Z])/g, (m, l, i) => (i === 0 ? l.toLowerCase() : '-' + l.toLowerCase()));
+        }
+
+        function buildSvgString(name, size) {
+            const el = createElement(icons[name], { width: size, height: size });
+            return el.outerHTML;
+        }
+
+        function renderIcons(names) {
+            grid.innerHTML = '';
+            if (names.length === 0) {
+                grid.innerHTML = `<div class="empty">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <p>No icons match your search.</p>
+                </div>`;
+                visibleCount.textContent = '0';
+                return;
+            }
+
+            visibleCount.textContent = names.length;
+
+            names.forEach(name => {
+                const kebab = toKebab(name);
+                const card = document.createElement('div');
+                card.className = 'icon-card';
+                card.title = `Click to copy ${kebab}`;
+
+                const iconEl = createElement(icons[name], { width: currentSize, height: currentSize });
+
+                const wrap = document.createElement('div');
+                wrap.className = 'icon-wrap';
+                wrap.appendChild(iconEl);
+
+                const label = document.createElement('div');
+                label.className = 'icon-name';
+                label.textContent = kebab;
+
+                const hint = document.createElement('div');
+                hint.className = 'copy-hint';
+                hint.textContent = 'Copy SVG';
+
+                card.appendChild(wrap);
+                card.appendChild(label);
+                card.appendChild(hint);
+
+                card.addEventListener('click', () => {
+                    const svg = buildSvgString(name, currentSize);
+                    navigator.clipboard.writeText(svg).then(() => {
+                        card.classList.add('copied');
+                        setTimeout(() => card.classList.remove('copied'), 1200);
+                        showToast();
+                    });
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        function showToast() {
+            toast.classList.add('toast-visible');
+            setTimeout(() => toast.classList.remove('toast-visible'), 2000);
+        }
+
+        window.filterIcons = function(query) {
+            const q = query.toLowerCase().trim();
+            const filtered = q
+                ? allIconNames.filter(n => toKebab(n).includes(q) || n.toLowerCase().includes(q))
+                : allIconNames;
+            renderIcons(filtered);
+        };
+
+        window.setSize = function(size) {
+            currentSize = size;
+            document.querySelectorAll('.size-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.size) === size);
+            });
+            const q = document.getElementById('searchInput').value;
+            window.filterIcons(q);
+        };
+
+        renderIcons(allIconNames);
+    </script>
+
+    <script>
+        (function(){const canvas=document.getElementById('bg-canvas');const gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');if(!gl)return;let mouse={x:.5,y:.5},sm={x:.5,y:.5};function resize(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}window.addEventListener('resize',resize);window.addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight;});const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;const fs=`precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float ray(vec2 src,vec2 dir,vec2 c,float a,float b,float s){vec2 d=c-src;vec2 dn=normalize(d);float ca=dot(dn,dir);float sp=pow(max(ca,0.),6.);float dist=length(d);float f=clamp((r.x*2.-dist)/(r.x*2.),0.,1.);float pulse=.7+.3*sin(t*s+ca*a);float base=clamp(.45+.15*sin(ca*a+t*s)+.3+.2*cos(-ca*b+t*s),0.,1.);return base*f*sp*pulse;}void main(){vec2 c=vec2(gl_FragCoord.x,r.y-gl_FragCoord.y);vec2 src=vec2(r.x*(.5+(m.x-.5)*.12),-r.y*.04);vec2 dir=normalize(vec2((m.x-.5)*.18,1.));float rays=ray(src,dir,c,36.22,21.11,1.5)*.55+ray(src,dir,c,22.4,18.02,1.1)*.4;vec3 col=rays*vec3(.55,.52,1.);col*=.15+(1.-c.y/r.y)*.85;float star=0.;for(int i=0;i<3;i++){vec2 cell=floor(c/(80.+float(i)*40.));vec2 h2=vec2(h(cell+float(i)*7.3),h(cell+float(i)*13.7));vec2 sp=(cell+h2)*(80.+float(i)*40.);float d=length(c-sp);float tw=.5+.5*sin(t*(1.5+h2.x*3.)+h2.y*6.28);star+=tw*smoothstep(1.8,0.,d)*(.3+h2.x*.7);}col+=star*vec3(.85,.88,1.)*.6;gl_FragColor=vec4(col,rays*.92+star*.5);}`;function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);const uT=gl.getUniformLocation(prog,'t'),uR=gl.getUniformLocation(prog,'r'),uM=gl.getUniformLocation(prog,'m');resize();function loop(ts){const s=.93;sm.x=sm.x*s+mouse.x*(1-s);sm.y=sm.y*s+mouse.y*(1-s);gl.uniform1f(uT,ts*.001);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uM,sm.x,sm.y);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(loop);}requestAnimationFrame(loop);})();
+    </script>
+
+    <audio id="bg-music" src="Blissful.mp3" loop preload="auto"></audio>
+    <button id="music-btn" title="Toggle music" aria-label="Toggle music">
+        <svg id="music-icon-on" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <svg id="music-icon-off" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+        <span class="music-label">Blissful</span>
+    </button>
+    <style>
+        #music-btn { position:fixed;bottom:24px;right:24px;left:auto;z-index:999;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;background:rgba(7,8,15,0.7);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);cursor:pointer;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;letter-spacing:0.2px;transition:all 0.2s;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);white-space:nowrap; }
+        #music-btn:hover { background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.22);color:#fff; }
+        #music-btn.muted { color:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.07); }
+        #music-btn .music-label { font-size:11px; }
+    </style>
+    <script>
+        (function(){const music=document.getElementById('bg-music'),btn=document.getElementById('music-btn'),on=document.getElementById('music-icon-on'),off=document.getElementById('music-icon-off');let playing=false;music.volume=0.35;function play(){music.play().then(()=>{playing=true;btn.classList.remove('muted');on.style.display='';off.style.display='none';}).catch(()=>{});}function first(){play();document.removeEventListener('click',first);document.removeEventListener('keydown',first);document.removeEventListener('touchstart',first);}document.addEventListener('click',first);document.addEventListener('keydown',first);document.addEventListener('touchstart',first);btn.addEventListener('click',e=>{e.stopPropagation();if(playing){music.pause();playing=false;btn.classList.add('muted');on.style.display='none';off.style.display='';}else{play();}});})();
+    </script>
+    <script src="chatbot.js"></script>
+</body>
+</html>

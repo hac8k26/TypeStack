@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service — TypeStack</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --radius: 16px;
+            --ring: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #07080f; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+        #bg-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        nav, .page-wrap, footer { position: relative; z-index: 1; }
+
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(7,8,15,0.6);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 16px 5%; display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand { font-weight: 600; font-size: 15px; letter-spacing: -0.5px; text-decoration: none; color: #fff; }
+        .btn {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06); cursor: pointer; font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,0.75); transition: all 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;
+        }
+        .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+
+        .page-wrap {
+            max-width: 720px; margin: 0 auto; padding: 64px 5% 80px;
+        }
+
+        .page-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: 1px;
+            color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+            letter-spacing: -1.5px; margin-bottom: 8px; line-height: 1.1; color: #fff;
+        }
+
+        .last-updated {
+            font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 48px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius); padding: 32px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-bottom: 16px;
+        }
+
+        .card h2 {
+            font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #fff;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .card h2 .num {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4);
+            font-size: 11px; font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .card p, .card li {
+            font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.75;
+        }
+
+        .card ul { padding-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding: 22px 5%; display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: rgba(255,255,255,0.35);
+        }
+        .footer-links { display: flex; gap: 16px; }
+        .footer-links a { color: rgba(255,255,255,0.35); text-decoration: none; }
+        .footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 600px) {
+            footer { flex-direction: column; gap: 10px; text-align: center; }
+            .footer-links { justify-content: center; }
+            .page-wrap { padding: 40px 5% 60px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav>
+        <a href="landing.html" class="brand">TypeStack</a>
+        <a href="landing.html" class="btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+        </a>
+    </nav>
+
+    <div class="page-wrap">
+        <!-- Title image -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;">
+            <svg width="40" height="40" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="52" height="52" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <circle cx="14" cy="26" r="3.5" fill="white" opacity="0.9"/>
+                <rect x="22" y="14" width="16" height="3.5" rx="1.75" fill="white"/>
+                <rect x="28.25" y="14" width="3.5" height="24" rx="1.75" fill="white"/>
+            </svg>
+            <div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.6px;line-height:1;">TypeStack</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;">Font &amp; Icon Library</div>
+            </div>
+        </div>
+        <p class="page-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Legal
+        </p>
+        <h1>Terms of Service</h1>
+        <p class="last-updated">Last updated: March 14, 2026</p>
+
+        <div class="card">
+            <h2><span class="num">1</span> Acceptance of Terms</h2>
+            <p>By accessing or using TypeStack, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use the service.</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">2</span> Description of Service</h2>
+            <p>TypeStack is a free font and icon discovery tool that allows users to preview, copy CSS snippets, and download fonts served by Google Fonts, as well as browse icons from the Lucide icon library. The service is provided as-is, free of charge, with no account required.</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">3</span> Font & Icon Licensing</h2>
+            <p>All fonts available through TypeStack are served by Google Fonts and are subject to their respective open-source licenses (typically SIL Open Font License or Apache License 2.0). Icons are from the Lucide library, licensed under the ISC License. By downloading or using any font or icon, you agree to comply with its individual license terms.</p>
+            <ul>
+                <li>TypeStack does not own or claim ownership of any fonts or icons.</li>
+                <li>Always verify the license of a font before using it in a commercial project.</li>
+                <li>Google Fonts licenses are available at fonts.google.com.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">4</span> Permitted Use</h2>
+            <p>You may use TypeStack for personal and commercial projects, subject to the following:</p>
+            <ul>
+                <li>You may not scrape, crawl, or automate requests to the service in a way that disrupts its availability.</li>
+                <li>You may not attempt to reverse-engineer, modify, or redistribute the TypeStack application itself.</li>
+                <li>You may not use the service for any unlawful purpose.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">5</span> Disclaimer of Warranties</h2>
+            <p>TypeStack is provided "as is" without warranties of any kind, express or implied. We do not guarantee uninterrupted access, accuracy of content, or fitness for a particular purpose. Font availability depends on third-party services (Google Fonts, jsDelivr) which are outside our control.</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">6</span> Limitation of Liability</h2>
+            <p>To the fullest extent permitted by law, TypeStack and its creators shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service, including but not limited to loss of data or business interruption.</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">7</span> Changes to Terms</h2>
+            <p>We reserve the right to update these terms at any time. Continued use of TypeStack after changes are posted constitutes your acceptance of the revised terms. We will update the "Last updated" date at the top of this page when changes are made.</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="num">8</span> Contact</h2>
+            <p>If you have any questions about these Terms of Service, please reach out via the TypeStack project page.</p>
+        </div>
+    </div>
+
+    <footer>
+        <a href="landing.html" class="brand" style="font-size:13px">TypeStack</a>
+        <div class="footer-links">
+            <a href="terms.html">Terms</a>
+            <a href="privacy.html">Privacy</a>
+        </div>
+    </footer>
+
+    <script>
+        (function(){const canvas=document.getElementById('bg-canvas');const gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');if(!gl)return;let mouse={x:.5,y:.5},sm={x:.5,y:.5};function resize(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}window.addEventListener('resize',resize);window.addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight;});const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;const fs=`precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float ray(vec2 src,vec2 dir,vec2 c,float a,float b,float s){vec2 d=c-src;vec2 dn=normalize(d);float ca=dot(dn,dir);float sp=pow(max(ca,0.),6.);float dist=length(d);float f=clamp((r.x*2.-dist)/(r.x*2.),0.,1.);float pulse=.7+.3*sin(t*s+ca*a);float base=clamp(.45+.15*sin(ca*a+t*s)+.3+.2*cos(-ca*b+t*s),0.,1.);return base*f*sp*pulse;}void main(){vec2 c=vec2(gl_FragCoord.x,r.y-gl_FragCoord.y);vec2 src=vec2(r.x*(.5+(m.x-.5)*.12),-r.y*.04);vec2 dir=normalize(vec2((m.x-.5)*.18,1.));float rays=ray(src,dir,c,36.22,21.11,1.5)*.55+ray(src,dir,c,22.4,18.02,1.1)*.4;vec3 col=rays*vec3(.55,.52,1.);col*=.15+(1.-c.y/r.y)*.85;float star=0.;for(int i=0;i<3;i++){vec2 cell=floor(c/(80.+float(i)*40.));vec2 h2=vec2(h(cell+float(i)*7.3),h(cell+float(i)*13.7));vec2 sp=(cell+h2)*(80.+float(i)*40.);float d=length(c-sp);float tw=.5+.5*sin(t*(1.5+h2.x*3.)+h2.y*6.28);star+=tw*smoothstep(1.8,0.,d)*(.3+h2.x*.7);}col+=star*vec3(.85,.88,1.)*.6;gl_FragColor=vec4(col,rays*.92+star*.5);}`;function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);const uT=gl.getUniformLocation(prog,'t'),uR=gl.getUniformLocation(prog,'r'),uM=gl.getUniformLocation(prog,'m');resize();function loop(ts){const s=.93;sm.x=sm.x*s+mouse.x*(1-s);sm.y=sm.y*s+mouse.y*(1-s);gl.uniform1f(uT,ts*.001);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uM,sm.x,sm.y);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(loop);}requestAnimationFrame(loop);})();
+    </script>
+    <script src="chatbot.js"></script>
+</body>
+</html>
