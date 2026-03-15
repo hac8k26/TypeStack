@@ -1223,38 +1223,54 @@ buildPeepsGrid();
 </style>
 <script>
 (function(){
-  const s=new Audio("click.mp3");s.volume=0.35;
-  const COLORS=['#818cf8','#c084fc','#34d399','#fb7185','#fbbf24','#38bdf8','#f472b6','#fff'];
-  function spawnSparks(x,y){
-    const count=12;
-    for(let i=0;i<count;i++){
-      const el=document.createElement('div');
-      el.className='spark';
-      const size=Math.random()*5+3;
-      const angle=(Math.PI*2/count)*i + (Math.random()-0.5)*0.5;
-      const dist=Math.random()*55+25;
-      const color=COLORS[Math.floor(Math.random()*COLORS.length)];
-      const dur=Math.random()*350+300;
-      el.style.cssText=`width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px;background:${color};box-shadow:0 0 ${size+2}px ${color};`;
-      document.body.appendChild(el);
-      const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
-      el.animate([
-        {transform:'translate(0,0) scale(1)',opacity:1},
-        {transform:`translate(${tx}px,${ty}px) scale(0)`,opacity:0}
-      ],{duration:dur,easing:'cubic-bezier(0,0,0.2,1)',fill:'forwards'}).onfinish=()=>el.remove();
-    }
-    // center flash
-    const flash=document.createElement('div');
-    flash.className='spark';
-    flash.style.cssText=`width:18px;height:18px;left:${x-9}px;top:${y-9}px;background:rgba(255,255,255,0.9);box-shadow:0 0 16px rgba(129,140,248,0.8);`;
-    document.body.appendChild(flash);
-    flash.animate([{transform:'scale(0)',opacity:1},{transform:'scale(2.5)',opacity:0}],{duration:300,easing:'ease-out',fill:'forwards'}).onfinish=()=>flash.remove();
+  const canvas=document.createElement('canvas');
+  canvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+  document.body.appendChild(canvas);
+  const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+  window.addEventListener('resize',resize);resize();
+
+  const SPARK_COLOR='#fff';
+  const SPARK_COUNT=8;
+  const SPARK_RADIUS=40;
+  const SPARK_SIZE=12;
+  const DURATION=500;
+
+  let sparks=[];
+  function ease(t){return t*(2-t);}
+
+  function loop(ts){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    sparks=sparks.filter(s=>{
+      const p=(ts-s.t)/DURATION;
+      if(p>=1)return false;
+      const e=ease(p);
+      const dist=e*SPARK_RADIUS;
+      const len=SPARK_SIZE*(1-e);
+      const x1=s.x+dist*Math.cos(s.a);
+      const y1=s.y+dist*Math.sin(s.a);
+      const x2=s.x+(dist+len)*Math.cos(s.a);
+      const y2=s.y+(dist+len)*Math.sin(s.a);
+      ctx.globalAlpha=1-e;
+      ctx.strokeStyle=SPARK_COLOR;
+      ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      return true;
+    });
+    ctx.globalAlpha=1;
+    requestAnimationFrame(loop);
   }
-  document.addEventListener("click",function(e){
+  requestAnimationFrame(loop);
+
+  const s=new Audio("click.mp3");s.volume=0.35;
+  document.addEventListener('click',function(e){
     if(e.target.closest("button,a,.cat-btn,.dock-item,.copy-btn,.btn,.nav-link,.size-btn,.illus-btn,.peep-btn,.color-swatch,.icon-card")){
       const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});
     }
-    spawnSparks(e.clientX,e.clientY);
+    const now=performance.now();
+    for(let i=0;i<SPARK_COUNT;i++){
+      sparks.push({x:e.clientX,y:e.clientY,a:(2*Math.PI*i)/SPARK_COUNT,t:now});
+    }
   });
 })();
 </script>
