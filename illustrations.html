@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeStack — Illustrations</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/css-peeps@1.0.1/css-peeps.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#07080f;color:#e2e8f0;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+        #bg-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+        nav,.content,#toast{position:relative;z-index:1;}
+        nav{position:sticky;top:0;z-index:50;background:rgba(7,8,15,0.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07);padding:16px 5%;display:flex;justify-content:space-between;align-items:center;}
+        .brand{font-weight:600;font-size:15px;letter-spacing:-0.5px;text-decoration:none;color:#fff;}
+        .nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+        .nav-link{padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);font-family:'Inter',sans-serif;}
+        .nav-link:hover{color:#fff;background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);}
+        .nav-link.active{color:#fff;background:rgba(129,140,248,0.15);border-color:rgba(129,140,248,0.35);}
+        .content{max-width:1400px;margin:0 auto;padding:60px 5% 180px;}
+        .hero{text-align:center;margin-bottom:48px;}
+        .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:100px;padding:5px 14px 5px 10px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.3px;margin-bottom:20px;}
+        .hero h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:800;letter-spacing:-2.5px;line-height:1.05;color:#fff;margin-bottom:16px;}
+        .hero h1 em{font-style:normal;background:linear-gradient(135deg,#818cf8 0%,#c084fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero p{font-size:15px;color:rgba(255,255,255,0.4);max-width:500px;margin:0 auto;line-height:1.7;}
+        .controls{display:none;}
+        .search-wrap{display:none;}
+        .sep{display:none;}
+        .stats-pill{display:none;}
+        /* category tags — inline below subtitle */
+        .cat-filter{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:24px;}
+        .cat-btn{padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;letter-spacing:0.2px;}
+        .cat-btn:hover{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.18);}
+        .cat-btn.active{background:rgba(129,140,248,0.15);border-color:rgba(129,140,248,0.4);color:#818cf8;}
+        /* floating search bar */
+        .float-bar{
+            position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+            z-index:100;
+            display:flex;align-items:center;gap:10px;
+            background:rgba(7,8,15,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(255,255,255,0.12);border-radius:100px;
+            padding:10px 18px;
+            width:auto;max-width:400px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.5);
+        }
+        .float-bar svg{color:rgba(255,255,255,0.3);flex-shrink:0;}
+        .float-bar input{flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#fff;font-family:'Inter',sans-serif;}
+        .float-bar input::placeholder{color:rgba(255,255,255,0.3);}
+        .float-bar .bar-sep{width:1px;height:18px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+        .float-bar .pill-count{font-size:11px;color:rgba(255,255,255,0.3);white-space:nowrap;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);}
+        .float-bar .pill-count strong{color:rgba(255,255,255,0.7);}
+        /* color picker row above search bar */
+        .color-bar{
+            position:fixed;bottom:76px;left:50%;transform:translateX(-50%);
+            z-index:100;
+            display:flex;align-items:center;gap:8px;
+            background:rgba(7,8,15,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(255,255,255,0.1);border-radius:100px;
+            padding:8px 14px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.4);
+        }
+        .color-bar-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:0.5px;white-space:nowrap;font-family:'Inter',sans-serif;}
+        .color-swatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s;flex-shrink:0;}
+        .color-swatch:hover{transform:scale(1.2);box-shadow:0 0 0 3px rgba(255,255,255,0.15);}
+        .color-swatch.active{border-color:#fff;transform:scale(1.15);box-shadow:0 0 0 3px rgba(255,255,255,0.2);}
+        #load-more-sentinel{text-align:center;padding:24px;font-size:11px;color:rgba(255,255,255,0.2);}
+        .section-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:14px;margin-top:44px;display:flex;align-items:center;gap:10px;}
+        .section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);}
+        .illus-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+        .illus-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.22s;display:flex;flex-direction:column;}
+        .illus-card:hover{border-color:rgba(255,255,255,0.16);background:rgba(255,255,255,0.07);transform:translateY(-3px);box-shadow:0 14px 28px rgba(0,0,0,0.35);}
+        .illus-preview{padding:24px 20px 16px;display:flex;align-items:center;justify-content:center;min-height:150px;background:rgba(255,255,255,0.02);}
+        .illus-preview svg{width:100%;height:120px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+        .illus-card:hover .illus-preview svg{transform:scale(1.06);}
+        .illus-footer{padding:10px 14px 12px;border-top:1px solid rgba(255,255,255,0.06);}
+        .illus-name{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:-0.1px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:capitalize;}
+        .illus-actions{display:flex;gap:5px;}
+        .illus-btn{flex:1;padding:5px 0;border-radius:5px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;letter-spacing:0.3px;}
+        .illus-btn:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2);}
+        .empty{text-align:center;padding:80px 20px;color:rgba(255,255,255,0.2);font-size:14px;}
+        .loading{text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3);font-size:13px;}
+        /* modal */
+        #modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,8,15,0.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+        #modal.open{display:flex;}
+        .modal-box{background:rgba(13,14,26,0.98);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;max-width:460px;width:100%;position:relative;box-shadow:0 32px 80px rgba(0,0,0,0.6);}
+        .modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);transition:all 0.2s;}
+        .modal-close:hover{color:#fff;background:rgba(255,255,255,0.1);}
+        .modal-preview{display:flex;align-items:center;justify-content:center;height:180px;margin-bottom:20px;}
+        .modal-preview svg{height:160px;width:100%;}
+        .modal-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.4px;margin-bottom:4px;text-transform:capitalize;}
+        .modal-cat{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:18px;}
+        .code-block{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,0.55);line-height:1.7;word-break:break-all;margin-bottom:12px;position:relative;}
+        .copy-code-btn{position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:5px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;}
+        .copy-code-btn:hover{color:#fff;background:rgba(255,255,255,0.12);}
+        .modal-actions{display:flex;gap:8px;margin-top:14px;}
+        .modal-btn{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+        .modal-btn:hover{background:rgba(255,255,255,0.12);color:#fff;}
+        .modal-btn.primary{background:#fff;color:#0f172a;border-color:#fff;}
+        .modal-btn.primary:hover{background:#e2e8f0;}
+        #toast{position:fixed;bottom:24px;right:24px;background:rgba(15,23,42,0.95);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all 0.3s ease;pointer-events:none;z-index:300;}
+        .toast-show{opacity:1!important;transform:translateY(0)!important;}
+        @media(max-width:600px){.illus-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}.content{padding:40px 4% 180px;}.float-bar{bottom:16px;}.color-bar{bottom:68px;}}
+        /* CSS Peeps section */
+        .peeps-section{margin-top:64px;}
+        .peeps-section-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+        .peeps-section-header .section-label{margin:0;flex:1;}
+        .peeps-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:rgba(192,132,252,0.12);border:1px solid rgba(192,132,252,0.25);font-size:10px;font-weight:600;color:#c084fc;letter-spacing:0.3px;}
+        .peeps-desc{font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:24px;line-height:1.6;}
+        .peeps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+        .peep-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.22s;display:flex;flex-direction:column;align-items:center;}
+        .peep-card:hover{border-color:rgba(255,255,255,0.16);background:rgba(255,255,255,0.07);transform:translateY(-3px);box-shadow:0 14px 28px rgba(0,0,0,0.35);}
+        .peep-preview{padding:20px 16px 8px;display:flex;align-items:flex-end;justify-content:center;min-height:160px;width:100%;}
+        [data-css-peeps]{width:120px;height:130px;display:block;flex-shrink:0;}
+        .peep-footer{padding:10px 14px 12px;border-top:1px solid rgba(255,255,255,0.06);width:100%;}
+        .peep-name{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .peep-actions{display:flex;gap:5px;}
+        .peep-btn{flex:1;padding:5px 0;border-radius:5px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+        .peep-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+        .peep-btn.copied{background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.3);color:#34d399;}
+    
+        .nav-github-mobile{display:none;}
+        @media(min-width:641px){
+          .nav-right{display:flex !important;}
+        }
+        @media(max-width:640px){
+          .nav-right{display:none !important;}
+          .nav-github-mobile{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);text-decoration:none;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.2s;}
+        }
+    </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<nav>
+    <a href="index.html" class="brand">
+        <svg height="20" viewBox="0 0 172 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="3.5" cy="14" r="3" fill="#818cf8"/>
+            <rect x="11" y="3" width="12" height="2.5" rx="1.25" fill="white"/>
+            <rect x="15.75" y="3" width="2.5" height="13" rx="1.25" fill="white"/>
+            <rect x="27" y="7" width="2.2" height="8" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="32" y="7" width="2.2" height="11" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="27" y="14.5" width="7.2" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="39" y="7" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="39" y="7" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="43" y="7" width="2.2" height="7" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="39" y="12" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="50" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="50" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="50" y="11" width="5.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="50" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="61" y="7" width="6.5" height="2" rx="1" fill="white"/>
+            <rect x="61" y="7" width="2.2" height="5" rx="1.1" fill="white"/>
+            <rect x="61" y="11" width="6.5" height="2" rx="1" fill="white"/>
+            <rect x="65.3" y="11" width="2.2" height="5" rx="1.1" fill="white"/>
+            <rect x="61" y="14" width="6.5" height="2" rx="1" fill="white"/>
+            <rect x="72" y="4" width="2.2" height="12" rx="1.1" fill="white"/>
+            <rect x="69.5" y="7" width="7" height="2" rx="1" fill="white"/>
+            <rect x="81" y="9" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="85.3" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="81" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="81" y="11" width="2.2" height="5" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="92" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="92" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="92" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="103" y="3" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+            <rect x="103" y="10" width="5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+            <line x1="106" y1="10" x2="110" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="106" y1="12" x2="110" y2="16" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+    </a>
+    <div class="nav-right">
+        <a href="fonts.html" class="nav-link">Fonts</a>
+        <a href="icons.html" class="nav-link">Icons</a>
+        <a href="colors.html" class="nav-link">Colors</a>
+        <a href="motion.html" class="nav-link">Motion</a>
+        <a href="illustrations.html" class="nav-link active">Illustrations</a>
+    </div>
+        <a href="https://github.com/hac8k26/TypeStack" target="_blank" rel="noopener" class="nav-github-mobile" aria-label="Star on GitHub">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            Star
+        </a>
+    </nav>
+
+
+<div class="content">
+    <div class="hero">
+        <div class="hero-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            unDraw · MIT Licensed · 1300+ illustrations
+        </div>
+        <h1>Beautiful <em>illustrations</em><br>for every project</h1>
+        <p>Open-source SVG illustrations. Pick a color, search, copy the embed code — free forever.</p>
+        <div class="cat-filter" id="catFilter"></div>
+    </div>
+
+    <div id="illusContainer"><div class="loading">Loading illustrations…</div></div>
+
+    <!-- CSS Peeps Section -->
+    <div class="peeps-section" id="peepsSection">
+        <div class="peeps-section-header">
+            <div class="section-label" style="margin-top:0">CSS Peeps</div>
+            <span class="peeps-badge">CSS Only · 520 Characters</span>
+        </div>
+        <p class="peeps-desc">Pure CSS character illustrations — no images, no SVG. Built with <a href="https://css-peeps.com" target="_blank" style="color:#c084fc;text-decoration:none">css-peeps</a> by Jane Ori. 520 unique characters with diverse hair, skin tones, outfits and accessories.</p>
+        <div class="peeps-grid" id="peepsGrid"></div>
+    </div>
+</div>
+
+<!-- Color picker bar -->
+<div class="color-bar">
+    <span class="color-bar-label">Color</span>
+    <div id="colorPicker" style="display:flex;gap:8px;align-items:center;"></div>
+</div>
+
+<!-- Floating search bar -->
+<div class="float-bar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="Search illustrations…" oninput="filterIllus(this.value)">
+    <span class="pill-count"><strong id="countLabel">0</strong> illus</span>
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="modal-preview" id="modal-preview"></div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-cat" id="modal-cat"></div>
+        <div class="code-block">
+            <button class="copy-code-btn" onclick="copyModalCode()">Copy</button>
+            <span id="modal-code"></span>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn" onclick="copyModalEmbed()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Embed
+            </button>
+            <button class="modal-btn primary" onclick="downloadSVG()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download SVG
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SPRITE_URL = 'https://cdn.jsdelivr.net/npm/@infrastatic.com/undraw@23.9.19/index.svg';
+
+const COLORS = [
+    {hex:'#818cf8',label:'Indigo'},
+    {hex:'#c084fc',label:'Purple'},
+    {hex:'#34d399',label:'Emerald'},
+    {hex:'#fb7185',label:'Rose'},
+    {hex:'#fbbf24',label:'Amber'},
+    {hex:'#38bdf8',label:'Sky'},
+    {hex:'#f472b6',label:'Pink'},
+    {hex:'#e2e8f0',label:'White'},
+];
+
+// Category keyword rules — first match wins
+const CAT_RULES = [
+    ['Developer',   /code|coding|program|develop|debug|bug|git|version|deploy|api|server|terminal|javascript|python|web-dev|static-web|open-source|android|ios|mobile-app|progressive|framework|database|cloud|devops|docker|kubernetes|repository|commit|branch|pull-request|stack|backend|frontend|full-stack|software|engineer|hacker|script|command|syntax|compiler|runtime|browser-stats|web-analytics/],
+    ['Design',      /design|art|color|palette|creative|sketch|wireframe|prototype|ui|ux|figma|illustrat|typography|font|icon|logo|brand|visual|aesthetic|canvas|draw|paint|brush|vector|pixel|mockup|layout|grid|component|style|theme|dark-mode|gradient|animation|motion/],
+    ['Productivity',/task|todo|to-do|list|goal|focus|plan|schedule|calendar|time|manage|organiz|workflow|checklist|project|milestone|deadline|sprint|kanban|scrum|board|note|reminder|habit|routine|priorit|efficien|productiv|accept-task|add-task|complete|done|finish|progress|track/],
+    ['Communication',/message|chat|talk|discuss|meeting|call|video|audio|voice|email|mail|newsletter|social|network|connect|share|post|comment|feedback|review|mention|notif|inbox|send|receive|broadcast|forum|community|team-collab|online-disc|collaborat/],
+    ['Business',    /business|finance|money|payment|invoice|bank|invest|stock|market|revenue|profit|loss|budget|expense|tax|wallet|cash|credit|card|shop|store|ecommerce|cart|order|product|service|startup|company|office|corporate|enterprise|deal|contract|agreement|partner|client|customer|sale|pitch|present/],
+    ['Data',        /data|analytic|chart|graph|report|dashboard|statistic|metric|insight|visualiz|table|spreadsheet|database|query|search|filter|sort|export|import|csv|json|api-data|machine-learn|ai|artificial|neural|predict|model|train|dataset|big-data|cloud-data/],
+    ['People',      /people|person|man|woman|girl|boy|team|group|friend|family|couple|community|crowd|user|avatar|profile|human|character|face|body|hand|work|remote|home|office-work|employ|staff|colleague|mentor|student|teacher|doctor|nurse|hero|superhero/],
+    ['Nature',      /nature|tree|plant|flower|garden|forest|mountain|ocean|sea|beach|sky|cloud|sun|moon|star|weather|rain|snow|wind|earth|world|globe|environment|eco|green|sustainable|animal|bird|fish|pet|dog|cat|wildlife/],
+    ['Health',      /health|medical|doctor|hospital|medicine|pill|drug|fitness|exercise|sport|yoga|run|gym|mental|wellness|diet|food|nutrition|heart|brain|body|care|therapy|vaccine|virus|covid|pandemic/],
+    ['Education',   /educat|learn|school|university|college|student|teacher|book|read|study|class|lesson|course|tutor|exam|test|quiz|knowledge|skill|train|certif|graduat|campus|library|research|science|math|physics|chemistry|biology|history|language/],
+    ['Travel',      /travel|trip|journey|adventure|explore|map|location|destination|flight|plane|airport|hotel|vacation|holiday|tourism|passport|luggage|backpack|road|car|bus|train|ship|cruise|camp|hike|mountain-travel/],
+    ['Misc',        /.*/],
+];
+
+function categorize(id) {
+    for (const [cat, re] of CAT_RULES) {
+        if (re.test(id)) return cat;
+    }
+    return 'Misc';
+}
+
+function idToName(id) {
+    return id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Built dynamically from sprite after load
+let ILLUSTRATIONS = [];
+
+let activeColor = COLORS[0].hex;
+let activeModal = null;
+let spriteText = null;
+let symbolMap = {};
+let toastTimer;
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('toast-show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('toast-show'), 2200);
+}
+
+// Parse sprite text into a map of id -> {viewBox, inner} and build ILLUSTRATIONS list
+function parseSprite(text) {
+    const re = /<symbol([^>]*)>([\s\S]*?)<\/symbol>/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+        const attrs = m[1];
+        const inner = m[2];
+        const idMatch = attrs.match(/id="([^"]+)"/);
+        const vbMatch = attrs.match(/viewBox="([^"]+)"/);
+        if (idMatch) {
+            const id = idMatch[1];
+            symbolMap[id] = {
+                viewBox: vbMatch ? vbMatch[1] : '0 0 800 600',
+                inner: inner
+            };
+            ILLUSTRATIONS.push({ id, name: idToName(id), cat: categorize(id) });
+        }
+    }
+    // Sort alphabetically within each category
+    ILLUSTRATIONS.sort((a, b) => a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
+}
+
+// Build an inline SVG with the accent color replaced
+function buildSVG(id, color) {
+    const sym = symbolMap[id];
+    if (!sym) return '';
+    // Replace unDraw's default accent (#036) with chosen color
+    const colored = sym.inner.replace(/#036\b/gi, color);
+    return `<svg viewBox="${sym.viewBox}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">${colored}</svg>`;
+}
+
+async function loadSprite() {
+    const res = await fetch(SPRITE_URL);
+    spriteText = await res.text();
+    parseSprite(spriteText);
+    buildCatFilter();
+    renderGrid(ILLUSTRATIONS);
+}
+
+// Category filter bar
+let activeCat = 'All';
+function buildCatFilter() {
+    const cats = ['All', ...new Set(ILLUSTRATIONS.map(i => i.cat))].sort((a,b) => a === 'All' ? -1 : b === 'All' ? 1 : a.localeCompare(b));
+    const wrap = document.getElementById('catFilter');
+    wrap.innerHTML = cats.map(c =>
+        `<button class="cat-btn${c === activeCat ? ' active' : ''}" onclick="setCat('${c}')">${c}</button>`
+    ).join('');
+}
+
+window.setCat = function(cat) {
+    activeCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.textContent === cat));
+    applyFilters();
+};
+
+let currentQuery = '';
+function applyFilters() {
+    let list = ILLUSTRATIONS;
+    if (activeCat !== 'All') list = list.filter(i => i.cat === activeCat);
+    if (currentQuery) list = list.filter(i =>
+        i.name.toLowerCase().includes(currentQuery) || i.id.toLowerCase().includes(currentQuery)
+    );
+    renderGrid(list);
+}
+
+// Virtual rendering — render PAGE_SIZE cards at a time
+const PAGE_SIZE = 80;
+let currentList = [];
+let renderedCount = 0;
+
+function renderGrid(list) {
+    currentList = list;
+    renderedCount = 0;
+    const container = document.getElementById('illusContainer');
+    document.getElementById('countLabel').textContent = list.length;
+    if (!list.length) { container.innerHTML = '<div class="empty">No illustrations match your search.</div>'; return; }
+    container.innerHTML = '<div id="cards-wrap"></div><div id="load-more-sentinel"></div>';
+    renderNextPage();
+    observeSentinel();
+}
+
+function renderNextPage() {
+    if (renderedCount >= currentList.length) {
+        document.getElementById('load-more-sentinel').style.display = 'none';
+        return;
+    }
+    const wrap = document.getElementById('cards-wrap');
+    const slice = currentList.slice(renderedCount, renderedCount + PAGE_SIZE);
+    renderedCount += slice.length;
+
+    // Group by category for this slice
+    const cats = [...new Set(slice.map(i => i.cat))];
+    cats.forEach(cat => {
+        // Check if section header already exists
+        let section = wrap.querySelector(`[data-cat-section="${cat}"]`);
+        if (!section) {
+            const label = document.createElement('div');
+            label.className = 'section-label';
+            label.textContent = cat;
+            wrap.appendChild(label);
+            section = document.createElement('div');
+            section.className = 'illus-grid';
+            section.dataset.catSection = cat;
+            wrap.appendChild(section);
+        }
+        slice.filter(i => i.cat === cat).forEach(item => {
+            const svg = buildSVG(item.id, activeColor);
+            const safeItem = JSON.stringify(item).replace(/"/g,'&quot;');
+            const card = document.createElement('div');
+            card.className = 'illus-card';
+            card.onclick = () => openModal(item);
+            card.innerHTML = `
+                <div class="illus-preview"><div data-illus-id="${item.id}">${svg || '<svg viewBox="0 0 200 120"><rect width="200" height="120" fill="rgba(255,255,255,0.04)" rx="8"/></svg>'}</div></div>
+                <div class="illus-footer">
+                    <div class="illus-name">${item.name}</div>
+                    <div class="illus-actions">
+                        <button class="illus-btn" onclick="event.stopPropagation();copyCard('${item.id}',this)">Copy SVG</button>
+                        <button class="illus-btn" onclick="event.stopPropagation();openModal(${safeItem})">Details</button>
+                    </div>
+                </div>`;
+            section.appendChild(card);
+        });
+    });
+
+    // Update remaining count
+    const remaining = currentList.length - renderedCount;
+    const sentinel = document.getElementById('load-more-sentinel');
+    if (remaining > 0) {
+        sentinel.style.display = 'block';
+        sentinel.textContent = `Showing ${renderedCount} of ${currentList.length} — scroll for more`;
+    } else {
+        sentinel.style.display = 'none';
+    }
+}
+
+let observer;
+function observeSentinel() {
+    if (observer) observer.disconnect();
+    observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) renderNextPage();
+    }, { rootMargin: '400px' });
+    const sentinel = document.getElementById('load-more-sentinel');
+    if (sentinel) observer.observe(sentinel);
+}
+
+function buildColorPicker() {
+    const wrap = document.getElementById('colorPicker');
+    wrap.innerHTML = '';
+    COLORS.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'color-swatch' + (c.hex === activeColor ? ' active' : '');
+        btn.style.background = c.hex;
+        btn.title = c.label;
+        btn.setAttribute('aria-label', c.label);
+        btn.onclick = () => {
+            activeColor = c.hex;
+            buildColorPicker();
+            refreshColors();
+        };
+        wrap.appendChild(btn);
+    });
+}
+
+function refreshColors() {
+    document.querySelectorAll('[data-illus-id]').forEach(el => {
+        const id = el.dataset.illusId;
+        el.innerHTML = buildSVG(id, activeColor);
+    });
+    if (activeModal) updateModal(activeModal);
+}
+
+function fullSVG(id) {
+    return buildSVG(id, activeColor);
+}
+
+function updateModal(item) {
+    document.getElementById('modal-preview').innerHTML = buildSVG(item.id, activeColor);
+    document.getElementById('modal-name').textContent = item.name;
+    document.getElementById('modal-cat').textContent = item.cat;
+    const svg = buildSVG(item.id, activeColor);
+    document.getElementById('modal-code').textContent = svg ? svg.substring(0, 220) + '…' : 'Not found in sprite';
+}
+
+function openModal(item) {
+    activeModal = item;
+    updateModal(item);
+    document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    activeModal = null;
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function copyModalEmbed() {
+    if (!activeModal) return;
+    navigator.clipboard.writeText(fullSVG(activeModal.id)).then(() => showToast('SVG copied!'));
+}
+
+function copyModalCode() {
+    if (!activeModal) return;
+    navigator.clipboard.writeText(fullSVG(activeModal.id)).then(() => showToast('Copied!'));
+}
+
+function downloadSVG() {
+    if (!activeModal) return;
+    const svg = fullSVG(activeModal.id);
+    const blob = new Blob([svg], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = activeModal.id + '.svg';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function renderGrid(list) {
+    const container = document.getElementById('illusContainer');
+    document.getElementById('countLabel').textContent = list.length;
+    if (!list.length) { container.innerHTML = '<div class="empty">No illustrations match your search.</div>'; return; }
+
+    const cats = [...new Set(list.map(i => i.cat))];
+    let html = '';
+    cats.forEach(cat => {
+        html += `<div class="section-label">${cat}</div><div class="illus-grid">`;
+        list.filter(i => i.cat === cat).forEach(item => {
+            const svg = buildSVG(item.id, activeColor);
+            const safeItem = JSON.stringify(item).replace(/"/g,'&quot;');
+            html += `<div class="illus-card" onclick="openModal(${safeItem})">
+                <div class="illus-preview"><div data-illus-id="${item.id}">${svg || '<svg viewBox="0 0 200 120"><rect width="200" height="120" fill="rgba(255,255,255,0.04)" rx="8"/><text x="100" y="65" text-anchor="middle" fill="rgba(255,255,255,0.15)" font-size="11" font-family="Inter,sans-serif">not found</text></svg>'}</div></div>
+                <div class="illus-footer">
+                    <div class="illus-name">${item.name}</div>
+                    <div class="illus-actions">
+                        <button class="illus-btn" onclick="event.stopPropagation();copyCard('${item.id}',this)">Copy SVG</button>
+                        <button class="illus-btn" onclick="event.stopPropagation();openModal(${safeItem})">Details</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+window.copyCard = function(id, btn) {
+    const svg = fullSVG(id);
+    navigator.clipboard.writeText(svg).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.color = '#818cf8';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+        showToast('SVG copied!');
+    });
+};
+
+window.filterIllus = function(q) {
+    currentQuery = q.toLowerCase().trim();
+    applyFilters();
+};
+
+buildColorPicker();
+loadSprite().catch(err => {
+    console.error(err);
+    document.getElementById('illusContainer').innerHTML = '<div class="empty">Failed to load illustrations. Check your connection.</div>';
+});
+</script>
+
+<script>
+// ─── CSS PEEPS SECTION ────────────────────────────────────────────────────────
+// 520 unique characters — all valid css-peeps v1.0.1 attributes
+// Fields: n=name, a=attrs, s=skin, h=hair, c=clothes, x=accessory-color
+const PEEPS = [
+  {n:"Mohawk Everyday",a:"mohawk2 smile-gap tee1 glasses4 beard2",s:"#c68642",h:"#111827",c:"#dc2626",x:"#67e8f9"},
+  {n:"Sierra Fashionista",a:"sierra driven dress glasses5 mustache2",s:"#5c3317",h:"#111827",c:"#f59e0b",x:"#67e8f9"},
+  {n:"Short Cool Kid",a:"short2 calm jacket glasses3 mustache9",s:"#5c3317",h:"#1e3a5f",c:"#34d399",x:"#67e8f9"},
+  {n:"Silver Medium Simple",a:"gray-medium loving-grin1 tee2 sunglasses1 mustache1",s:"#deb887",h:"#e2e8f0",c:"#fbbf24",x:"#fb923c"},
+  {n:"Silver Medium Rebel",a:"gray-medium suspicious killer beard4",s:"#a0522d",h:"#111827",c:"#10b981",x:"#818cf8"},
+  {n:"Cornrows Gamer",a:"cornrows1 old gaming glasses1 beard3",s:"#5c3317",h:"#7c3aed",c:"#1e293b",x:"#f472b6"},
+  {n:"Medium Bangs Scientist",a:"medium-bangs2 concerned-fear shirt-coat goatee2",s:"#c68642",h:"#7c3aed",c:"#c084fc",x:"#67e8f9"},
+  {n:"Silver Short Executive",a:"gray-short old blazer mustache3",s:"#5c3317",h:"#7f1d1d",c:"#16a34a",x:"#67e8f9"},
+  {n:"Medium Bangs Developer",a:"medium-bangs2 eyes-closed laptop eyepatch mustache7",s:"#c68642",h:"#dc2626",c:"#2dd4bf",x:"#2dd4bf"},
+  {n:"Medium Influencer",a:"medium2 laughing phone eyepatch mustache2",s:"#c68642",h:"#e2e8f0",c:"#fbbf24",x:"#38bdf8"},
+  {n:"Medium Gamer",a:"medium3 eyes-closed gaming eyepatch mustache9",s:"#deb887",h:"#4b5563",c:"#9333ea",x:"#fbbf24"},
+  {n:"Turban Simple",a:"turban loving-grin1 tee2 beard3",s:"#c68642",h:"#7f1d1d",c:"#ec4899",x:"#818cf8"},
+  {n:"High Bun Coffee Lover",a:"bun2 sad coffee",s:"#f1c27d",h:"#dc2626",c:"#0f172a",x:"#fb7185"},
+  {n:"Bun Chill",a:"bun1 calm tee-crossed chinhair",s:"#deb887",h:"#4b5563",c:"#84cc16",x:"#38bdf8"},
+  {n:"Mohawk Intellectual",a:"mohawk2 monster turtleneck glasses1 mustache8",s:"#fde8d8",h:"#7c3aed",c:"#0284c7",x:"#818cf8"},
+  {n:"Long Bangs Presenter",a:"long-bangs serious explaining mustache5",s:"#a0522d",h:"#16a34a",c:"#f59e0b",x:"#818cf8"},
+  {n:"Bald Intellectual",a:"bald1 calm turtleneck goatee1",s:"#d4956a",h:"#1e3a5f",c:"#9333ea",x:"#fb7185"},
+  {n:"Long Curly Simple",a:"long-curly gasp tee2 sunglasses1",s:"#c68642",h:"#6d28d9",c:"#8b5cf6",x:"#f472b6"},
+  {n:"Short Developer",a:"short3 smile laptop",s:"#e0ac69",h:"#374151",c:"#0284c7",x:"#fb7185"},
+  {n:"Short Indifferent",a:"short3 eyes-closed shrug mustache3",s:"#d4956a",h:"#dc2626",c:"#ef4444",x:"#e2e8f0"},
+  {n:"Flat Top Formal",a:"flat-top1 smile-gap buttonup2 mustache6",s:"#e8b89a",h:"#fbbf24",c:"#8b5cf6",x:"#e2e8f0"},
+  {n:"Short Sports Fan",a:"short3 awe sporty-tee mustache4",s:"#d4956a",h:"#065f46",c:"#6366f1",x:"#c084fc"},
+  {n:"Afro Presenter",a:"afro smile-big explaining",s:"#f5c5a3",h:"#451a03",c:"#f97316",x:"#e2e8f0"},
+  {n:"Turban Everyday",a:"turban eyes-closed tee1 mustache5",s:"#c68642",h:"#e2e8f0",c:"#f472b6",x:"#2dd4bf"},
+  {n:"Flat Top Gamer",a:"flat-top2 fangry gaming mustache1",s:"#a0522d",h:"#4b5563",c:"#0284c7",x:"#67e8f9"},
+  {n:"Silver Medium Scientist",a:"gray-medium peace shirt-coat glasses2 goatee2",s:"#c68642",h:"#374151",c:"#db2777",x:"#fb7185"},
+  {n:"Flat Top Hoodie Fan",a:"flat-top1 serious hoodie",s:"#5c3317",h:"#4b5563",c:"#ec4899",x:"#34d399"},
+  {n:"Double Buns Cozy",a:"buns concerned-fear sweater-dots chinhair",s:"#e0ac69",h:"#111827",c:"#ec4899",x:"#34d399"},
+  {n:"Silver Medium Writer",a:"gray-medium eyes-closed paper glasses3 mustache2",s:"#e0ac69",h:"#3d2b1f",c:"#0ea5e9",x:"#c084fc"},
+  {n:"Afro Gamer",a:"afro monster gaming glasses3 beard1",s:"#a0522d",h:"#6b21a8",c:"#2dd4bf",x:"#e2e8f0"},
+  {n:"High Bun Chill",a:"bun2 sad tee-crossed glasses1",s:"#d4956a",h:"#6b21a8",c:"#818cf8",x:"#c084fc"},
+  {n:"Long Bangs Presenter",a:"long-bangs angry explaining glasses2",s:"#5c3317",h:"#4b5563",c:"#059669",x:"#f472b6"},
+  {n:"Bald Gamer",a:"bald1 eyes-closed gaming",s:"#e8b89a",h:"#451a03",c:"#0f172a",x:"#f472b6"},
+  {n:"Short Trendy",a:"short3 smile-gap polkadot-jacket sunglasses1",s:"#f5c5a3",h:"#6d28d9",c:"#0ea5e9",x:"#34d399"},
+  {n:"Hijab Developer",a:"hijab blank laptop eyepatch mustache4",s:"#c68642",h:"#374151",c:"#f472b6",x:"#e2e8f0"},
+  {n:"Shaved Rebel",a:"shaved3 smile-big killer mustache6",s:"#deb887",h:"#16a34a",c:"#0ea5e9",x:"#fb923c"},
+  {n:"Flat Top Fashionista",a:"flat-top1 old dress mustache3",s:"#e8b89a",h:"#7c3aed",c:"#7c3aed",x:"#fb923c"},
+  {n:"Shaved Writer",a:"shaved2 cute paper glasses4",s:"#a0522d",h:"#dc2626",c:"#8b5cf6",x:"#38bdf8"},
+  {n:"Hijab Athlete",a:"hijab eating-happy tank glasses2 mustache7",s:"#e8b89a",h:"#be185d",c:"#7c3aed",x:"#38bdf8"},
+  {n:"Long Curly Trendy",a:"long-curly monster polkadot-jacket chinhair",s:"#5c3317",h:"#dc2626",c:"#0ea5e9",x:"#2dd4bf"},
+  {n:"Shaved Cool Kid",a:"shaved2 serious jacket glasses5 mustache8",s:"#c68642",h:"#4b5563",c:"#f97316",x:"#fb923c"},
+  {n:"Bantu Knots Hoodie Fan",a:"bantu-knots cheeky hoodie glasses5",s:"#8d5524",h:"#111827",c:"#f59e0b",x:"#fbbf24"},
+  {n:"Short Cool Kid",a:"short4 concerned-fear jacket sunglasses1 mustache4",s:"#d4956a",h:"#92400e",c:"#f59e0b",x:"#fb7185"},
+  {n:"Mohawk Presenter",a:"mohawk1 eyes-closed explaining chinhair",s:"#a0522d",h:"#1e3a5f",c:"#7c3aed",x:"#67e8f9"},
+  {n:"Long Afro Intellectual",a:"long-afro smile-gap turtleneck glasses2 beard4",s:"#f5c5a3",h:"#fbbf24",c:"#f97316",x:"#f472b6"},
+  {n:"Twists Simple",a:"twists1 smile tee2 sunglasses1",s:"#e8b89a",h:"#111827",c:"#84cc16",x:"#c084fc"},
+  {n:"Silver Bun Formal",a:"gray-bun old buttonup2 sunglasses2 mustache5",s:"#8d5524",h:"#3d2b1f",c:"#16a34a",x:"#a78bfa"},
+  {n:"Sierra Energetic",a:"sierra hectic thunder-tee glasses3",s:"#fde8d8",h:"#6b21a8",c:"#f472b6",x:"#67e8f9"},
+  {n:"Mohawk Presenter",a:"mohawk2 sad explaining mustache1",s:"#e8b89a",h:"#451a03",c:"#06b6d4",x:"#38bdf8"},
+  {n:"Cornrows Hoodie Fan",a:"cornrows1 loving-grin2 hoodie sunglasses2 mustache5",s:"#a0522d",h:"#451a03",c:"#2dd4bf",x:"#e2e8f0"},
+  {n:"Beanie Cool Kid",a:"beanie smile-gap jacket glasses5",s:"#deb887",h:"#be185d",c:"#ec4899",x:"#818cf8"},
+  {n:"Cornrows Rebel",a:"cornrows1 concerned-fear killer eyepatch mustache7",s:"#deb887",h:"#9ca3af",c:"#8b5cf6",x:"#fb7185"},
+  {n:"Bangs Presenter",a:"bangs1 eyes-closed explaining glasses1",s:"#c68642",h:"#16a34a",c:"#38bdf8",x:"#fb923c"},
+  {n:"Sierra Intellectual",a:"sierra calm turtleneck glasses3",s:"#deb887",h:"#111827",c:"#14b8a6",x:"#fb923c"},
+  {n:"Silver Bun Fan",a:"gray-bun laughing tee-selena mustache8",s:"#deb887",h:"#dc2626",c:"#fb923c",x:"#34d399"},
+  {n:"Short Cozy",a:"short3 eyes-closed sweater-dots goatee2",s:"#e0ac69",h:"#111827",c:"#c084fc",x:"#2dd4bf"},
+  {n:"Cornrows Relaxed",a:"cornrows2 cheeky sweater-crossed eyepatch mustache1",s:"#5c3317",h:"#0369a1",c:"#ef4444",x:"#a78bfa"},
+  {n:"Shaved Indifferent",a:"shaved3 cyclops shrug glasses3 mustache7",s:"#f5c5a3",h:"#6d28d9",c:"#059669",x:"#38bdf8"},
+  {n:"Flat Top Hipster",a:"flat-top2 peace striped-tee glasses2 mustache7",s:"#5c3317",h:"#1e3a5f",c:"#ef4444",x:"#c084fc"},
+  {n:"Flat Top Trendy",a:"flat-top1 smile polkadot-jacket sunglasses1 mustache4",s:"#8d5524",h:"#7c3aed",c:"#38bdf8",x:"#2dd4bf"},
+  {n:"Mohawk Sports Fan",a:"mohawk1 concerned-fear sporty-tee",s:"#deb887",h:"#451a03",c:"#0ea5e9",x:"#34d399"},
+  {n:"Long Afro Cozy",a:"long-afro old sweater-dots sunglasses1",s:"#deb887",h:"#92400e",c:"#ec4899",x:"#2dd4bf"},
+  {n:"Mohawk Trendy",a:"mohawk1 calm polkadot-jacket glasses3 mustache8",s:"#deb887",h:"#dc2626",c:"#ec4899",x:"#a78bfa"},
+  {n:"Short Hipster",a:"short5 concerned-fear striped-tee glasses3 mustache7",s:"#8d5524",h:"#78350f",c:"#e2e8f0",x:"#e2e8f0"},
+  {n:"Bantu Knots Influencer",a:"bantu-knots hectic phone glasses5 mustache4",s:"#f1c27d",h:"#dc2626",c:"#e2e8f0",x:"#a78bfa"},
+  {n:"Long Curly Gamer",a:"long-curly cheeky gaming",s:"#c68642",h:"#065f46",c:"#16a34a",x:"#fb923c"},
+  {n:"Sierra Athlete",a:"sierra gasp tank",s:"#5c3317",h:"#1c1917",c:"#84cc16",x:"#c084fc"},
+  {n:"Long Curly Coffee Lover",a:"long-curly calm coffee mustache1",s:"#e0ac69",h:"#3d2b1f",c:"#38bdf8",x:"#818cf8"},
+  {n:"Mohawk Presenter",a:"mohawk2 fear explaining glasses1",s:"#fde8d8",h:"#7c3aed",c:"#ec4899",x:"#fbbf24"},
+  {n:"Cornrows Executive",a:"cornrows1 gasp blazer glasses2 beard4",s:"#fde8d8",h:"#dc2626",c:"#fb7185",x:"#c084fc"},
+  {n:"Short Gamer",a:"short2 cyclops gaming mustache8",s:"#c68642",h:"#1e3a5f",c:"#0ea5e9",x:"#67e8f9"},
+  {n:"Short Writer",a:"short3 old paper",s:"#e8b89a",h:"#1e3a5f",c:"#ec4899",x:"#f472b6"},
+  {n:"Bald Leader",a:"bald1 peace pointing-up glasses2 chinhair",s:"#f5c5a3",h:"#4b5563",c:"#0284c7",x:"#a78bfa"},
+  {n:"Short Fan",a:"short3 monster tee-selena beard1",s:"#e8b89a",h:"#d97706",c:"#f97316",x:"#fb923c"},
+  {n:"Medium Gamer",a:"medium2 smile gaming sunglasses2 mustache2",s:"#c68642",h:"#7f1d1d",c:"#ef4444",x:"#67e8f9"},
+  {n:"Hijab Rebel",a:"hijab fear killer sunglasses1 goatee1",s:"#e0ac69",h:"#e2e8f0",c:"#fb923c",x:"#818cf8"},
+  {n:"Bangs Energetic",a:"bangs1 blank thunder-tee glasses3 mustache9",s:"#deb887",h:"#111827",c:"#38bdf8",x:"#fbbf24"},
+  {n:"Silver Bun Chill",a:"gray-bun awe tee-crossed beard1",s:"#f5c5a3",h:"#451a03",c:"#1e293b",x:"#fbbf24"},
+  {n:"Silver Short Intellectual",a:"gray-short blank turtleneck glasses3 beard1",s:"#e8b89a",h:"#374151",c:"#0284c7",x:"#34d399"},
+  {n:"Sierra Intellectual",a:"sierra angry turtleneck eyepatch",s:"#e0ac69",h:"#d97706",c:"#8b5cf6",x:"#fbbf24"},
+  {n:"High Bun Presenter",a:"bun2 gasp explaining sunglasses2",s:"#c68642",h:"#1e3a5f",c:"#dc2626",x:"#fb923c"},
+  {n:"Medium Bangs Sports Fan",a:"medium-bangs3 cyclops sporty-tee sunglasses2 chinhair",s:"#f5c5a3",h:"#6d28d9",c:"#dc2626",x:"#fbbf24"},
+  {n:"Medium Preppy",a:"medium1 cheeky polo-sweater mustache1",s:"#c68642",h:"#d97706",c:"#10b981",x:"#34d399"},
+  {n:"Cornrows Gamer",a:"cornrows2 calm gaming mustache5",s:"#e8b89a",h:"#4b5563",c:"#34d399",x:"#67e8f9"},
+  {n:"Bun Executive",a:"bun1 blank blazer sunglasses2",s:"#d4956a",h:"#e2e8f0",c:"#10b981",x:"#fb7185"},
+  {n:"Twists Fashionista",a:"twists1 calm dress glasses2 goatee2",s:"#c68642",h:"#7f1d1d",c:"#34d399",x:"#a78bfa"},
+  {n:"Medium Bangs Trendy",a:"medium-bangs2 old polkadot-jacket sunglasses2 goatee1",s:"#e0ac69",h:"#16a34a",c:"#0284c7",x:"#a78bfa"},
+  {n:"Twists Casual",a:"twists2 loving-grin1 striped-pocket-tee beard4",s:"#deb887",h:"#7c3aed",c:"#fbbf24",x:"#2dd4bf"},
+  {n:"Bangs Everyday",a:"bangs1 loving-grin1 tee1 beard1",s:"#fde8d8",h:"#6d28d9",c:"#059669",x:"#fb7185"},
+  {n:"Turban Hoodie Fan",a:"turban cute hoodie glasses5",s:"#fde8d8",h:"#be185d",c:"#10b981",x:"#e2e8f0"},
+  {n:"Short Everyday",a:"short3 smile-big tee1 mustache4",s:"#8d5524",h:"#fbbf24",c:"#fbbf24",x:"#c084fc"},
+  {n:"Double Buns Cozy",a:"buns fear sweater-dots eyepatch",s:"#5c3317",h:"#78350f",c:"#fb7185",x:"#e2e8f0"},
+  {n:"Silver Bun Trendy",a:"gray-bun laughing polkadot-jacket mustache1",s:"#e8b89a",h:"#fbbf24",c:"#84cc16",x:"#f472b6"},
+  {n:"Mohawk Simple",a:"mohawk1 loving-grin2 tee2 glasses4 mustache5",s:"#fde8d8",h:"#4b5563",c:"#db2777",x:"#2dd4bf"},
+  {n:"Long Curly Scientist",a:"long-curly angry shirt-coat eyepatch mustache6",s:"#e0ac69",h:"#dc2626",c:"#0284c7",x:"#fbbf24"},
+  {n:"Silver Short Chill",a:"gray-short eyes-closed tee-crossed glasses1",s:"#e0ac69",h:"#4b5563",c:"#14b8a6",x:"#fb923c"},
+  {n:"Medium Cool Kid",a:"medium2 talking jacket sunglasses1",s:"#deb887",h:"#7f1d1d",c:"#fb923c",x:"#fb7185"},
+  {n:"Silver Short Hipster",a:"gray-short eating-happy striped-tee glasses5 mustache5",s:"#fde8d8",h:"#e2e8f0",c:"#16a34a",x:"#2dd4bf"},
+  {n:"Medium Indifferent",a:"medium1 monster shrug sunglasses1",s:"#f1c27d",h:"#6d28d9",c:"#f59e0b",x:"#38bdf8"},
+  {n:"Long Straight Sports Fan",a:"long-straight awe sporty-tee mustache2",s:"#c68642",h:"#e2e8f0",c:"#e2e8f0",x:"#2dd4bf"},
+  {n:"Medium Bangs Formal",a:"medium-bangs3 monster buttonup2 mustache2",s:"#a0522d",h:"#065f46",c:"#0ea5e9",x:"#38bdf8"},
+  {n:"Hijab Everyday",a:"hijab monster tee1 eyepatch",s:"#d4956a",h:"#7c3aed",c:"#34d399",x:"#fb923c"},
+  {n:"Short Professional",a:"short3 driven buttonup1 glasses4 mustache8",s:"#f1c27d",h:"#6d28d9",c:"#f472b6",x:"#a78bfa"},
+  {n:"Sierra Casual",a:"sierra peace striped-pocket-tee sunglasses2 mustache4",s:"#5c3317",h:"#0369a1",c:"#16a34a",x:"#67e8f9"},
+  {n:"Long Curly Relaxed",a:"long-curly hectic sweater-crossed eyepatch mustache2",s:"#d4956a",h:"#4b5563",c:"#2dd4bf",x:"#f472b6"},
+  {n:"Medium Straight Trendy",a:"medium-straight smile polkadot-jacket sunglasses1",s:"#f5c5a3",h:"#111827",c:"#e2e8f0",x:"#fbbf24"},
+  {n:"Turban Energetic",a:"turban calm thunder-tee",s:"#c68642",h:"#374151",c:"#f97316",x:"#fb7185"},
+  {n:"Bun Chill",a:"bun1 sad tee-crossed",s:"#e8b89a",h:"#9ca3af",c:"#818cf8",x:"#67e8f9"},
+  {n:"High Bun Fashionista",a:"bun2 driven dress glasses4 mustache6",s:"#e0ac69",h:"#4b5563",c:"#f472b6",x:"#2dd4bf"},
+  {n:"Silver Bun Cool Kid",a:"gray-bun awe jacket sunglasses1 beard4",s:"#fde8d8",h:"#16a34a",c:"#818cf8",x:"#818cf8"},
+  {n:"Bald Relaxed",a:"bald3 sad sweater-crossed sunglasses2 mustache1",s:"#5c3317",h:"#9ca3af",c:"#0ea5e9",x:"#fb923c"},
+  {n:"Silver Bun Casual",a:"gray-bun cyclops striped-pocket-tee beard2",s:"#deb887",h:"#6d28d9",c:"#fb7185",x:"#fbbf24"},
+  {n:"Turban Chill",a:"turban hectic tee-crossed mustache6",s:"#5c3317",h:"#1e3a5f",c:"#9333ea",x:"#fb7185"},
+  {n:"Medium Bangs Energetic",a:"medium-bangs1 smile-gap thunder-tee eyepatch",s:"#d4956a",h:"#be185d",c:"#ec4899",x:"#67e8f9"},
+  {n:"Teddy Fashionista",a:"teddy smile-gap dress sunglasses2",s:"#8d5524",h:"#451a03",c:"#6366f1",x:"#e2e8f0"},
+  {n:"Turban Fashionista",a:"turban eyes-closed dress glasses2 beard3",s:"#a0522d",h:"#6d28d9",c:"#0ea5e9",x:"#fb7185"},
+  {n:"Bantu Knots Professional",a:"bantu-knots fear buttonup1",s:"#deb887",h:"#9ca3af",c:"#10b981",x:"#e2e8f0"},
+  {n:"Silver Medium Fan",a:"gray-medium fear tee-selena mustache5",s:"#c68642",h:"#92400e",c:"#8b5cf6",x:"#fb7185"},
+  {n:"Bald Simple",a:"bald1 cheeky tee2 glasses2 mustache3",s:"#d4956a",h:"#e2e8f0",c:"#f59e0b",x:"#c084fc"},
+  {n:"Bantu Knots Chill",a:"bantu-knots driven tee-crossed mustache1",s:"#a0522d",h:"#111827",c:"#1e293b",x:"#f472b6"},
+  {n:"Medium Bangs Formal",a:"medium-bangs1 smile buttonup2 beard3",s:"#a0522d",h:"#7f1d1d",c:"#fb923c",x:"#fbbf24"},
+  {n:"Short Sports Fan",a:"short5 old sporty-tee sunglasses1",s:"#e0ac69",h:"#7f1d1d",c:"#059669",x:"#a78bfa"},
+  {n:"Medium Fashionista",a:"medium2 fangry dress goatee1",s:"#a0522d",h:"#6b21a8",c:"#ec4899",x:"#f472b6"},
+  {n:"Medium Professional",a:"medium2 laughing buttonup1 glasses1",s:"#deb887",h:"#d97706",c:"#84cc16",x:"#818cf8"},
+  {n:"Silver Short Cozy",a:"gray-short blank sweater-dots sunglasses1 beard1",s:"#d4956a",h:"#0369a1",c:"#14b8a6",x:"#34d399"},
+  {n:"Mohawk Rebel",a:"mohawk2 gasp killer glasses1 beard4",s:"#c68642",h:"#3d2b1f",c:"#818cf8",x:"#38bdf8"},
+  {n:"Side Bangs Indifferent",a:"bangs2 fangry shrug",s:"#e0ac69",h:"#7c3aed",c:"#84cc16",x:"#fb7185"},
+  {n:"Bald Coffee Lover",a:"bald2 fangry coffee glasses4 mustache3",s:"#f5c5a3",h:"#92400e",c:"#fb7185",x:"#34d399"},
+  {n:"Double Buns Relaxed",a:"buns fangry sweater-crossed mustache6",s:"#8d5524",h:"#0369a1",c:"#16a34a",x:"#f472b6"},
+  {n:"Short Intellectual",a:"short1 eyes-closed turtleneck mustache3",s:"#f5c5a3",h:"#065f46",c:"#fb7185",x:"#fb7185"},
+  {n:"Shaved Energetic",a:"shaved2 loving-grin2 thunder-tee glasses1",s:"#f5c5a3",h:"#92400e",c:"#1e293b",x:"#818cf8"},
+  {n:"High Bun Rebel",a:"bun2 talking killer mustache7",s:"#e8b89a",h:"#6d28d9",c:"#fb7185",x:"#e2e8f0"},
+  {n:"Short Trendy",a:"short4 cute polkadot-jacket sunglasses2 mustache6",s:"#f5c5a3",h:"#78350f",c:"#ef4444",x:"#2dd4bf"},
+  {n:"Double Buns Hoodie Fan",a:"buns peace hoodie glasses3",s:"#c68642",h:"#be185d",c:"#38bdf8",x:"#2dd4bf"},
+  {n:"Short Scientist",a:"short3 old shirt-coat",s:"#c68642",h:"#3d2b1f",c:"#e2e8f0",x:"#fb923c"},
+  {n:"Long Bangs Everyday",a:"long-bangs peace tee1 mustache1",s:"#5c3317",h:"#1c1917",c:"#db2777",x:"#e2e8f0"},
+  {n:"Short Fan",a:"short1 fangry tee-selena",s:"#8d5524",h:"#9ca3af",c:"#9333ea",x:"#fbbf24"},
+  {n:"Medium Writer",a:"medium2 calm paper",s:"#8d5524",h:"#1e3a5f",c:"#f472b6",x:"#e2e8f0"},
+  {n:"Medium Bangs Influencer",a:"medium-bangs1 cheeky phone sunglasses1 mustache1",s:"#c68642",h:"#dc2626",c:"#ef4444",x:"#67e8f9"},
+  {n:"Short Simple",a:"short3 talking tee2",s:"#fde8d8",h:"#fbbf24",c:"#6366f1",x:"#34d399"},
+  {n:"Turban Fan",a:"turban awe tee-selena glasses1 chinhair",s:"#d4956a",h:"#16a34a",c:"#0ea5e9",x:"#e2e8f0"},
+  {n:"Bald Rebel",a:"bald1 rage killer",s:"#deb887",h:"#4b5563",c:"#c084fc",x:"#fbbf24"},
+  {n:"Short Sports Fan",a:"short1 eating-happy sporty-tee glasses2 beard4",s:"#c68642",h:"#451a03",c:"#ef4444",x:"#f472b6"},
+  {n:"Silver Bun Coffee Lover",a:"gray-bun old coffee goatee1",s:"#5c3317",h:"#92400e",c:"#1e293b",x:"#67e8f9"},
+  {n:"Shaved Rebel",a:"shaved1 concerned-fear killer sunglasses1 beard2",s:"#fde8d8",h:"#e2e8f0",c:"#84cc16",x:"#67e8f9"},
+  {n:"High Bun Simple",a:"bun2 angry tee2 mustache2",s:"#e8b89a",h:"#d97706",c:"#14b8a6",x:"#f472b6"},
+  {n:"Bald Cool Kid",a:"bald1 smile jacket sunglasses2 mustache8",s:"#f1c27d",h:"#d97706",c:"#7c3aed",x:"#34d399"},
+  {n:"Bun Writer",a:"bun1 talking paper sunglasses2 mustache6",s:"#5c3317",h:"#78350f",c:"#16a34a",x:"#fb7185"},
+  {n:"Afro Formal",a:"afro smile buttonup2",s:"#5c3317",h:"#6d28d9",c:"#9333ea",x:"#c084fc"},
+  {n:"Bald Cozy",a:"bald3 rage sweater-dots glasses5 chinhair",s:"#e8b89a",h:"#3d2b1f",c:"#0284c7",x:"#34d399"},
+  {n:"Teddy Formal",a:"teddy loving-grin2 buttonup2 beard4",s:"#f5c5a3",h:"#7f1d1d",c:"#c084fc",x:"#fb7185"},
+  {n:"Shaved Energetic",a:"shaved3 cheeky thunder-tee",s:"#deb887",h:"#111827",c:"#ef4444",x:"#818cf8"},
+  {n:"Short Preppy",a:"short5 tired polo-sweater glasses1 mustache2",s:"#5c3317",h:"#d97706",c:"#2dd4bf",x:"#2dd4bf"},
+  {n:"Medium Bangs Developer",a:"medium-bangs2 hectic laptop glasses2",s:"#a0522d",h:"#3d2b1f",c:"#ef4444",x:"#818cf8"},
+  {n:"Medium Straight Coffee Lover",a:"medium-straight awe coffee mustache8",s:"#a0522d",h:"#6b21a8",c:"#db2777",x:"#fbbf24"},
+  {n:"Silver Bun Athlete",a:"gray-bun smile tank chinhair",s:"#deb887",h:"#be185d",c:"#818cf8",x:"#67e8f9"},
+  {n:"High Bun Simple",a:"bun2 cyclops tee2 goatee1",s:"#f5c5a3",h:"#d97706",c:"#0f172a",x:"#f472b6"},
+  {n:"Sierra Relaxed",a:"sierra gasp sweater-crossed mustache2",s:"#a0522d",h:"#111827",c:"#ec4899",x:"#fbbf24"},
+  {n:"Afro Everyday",a:"afro rage tee1 glasses5",s:"#c68642",h:"#0369a1",c:"#f59e0b",x:"#38bdf8"},
+  {n:"Medium Relaxed",a:"medium2 cyclops sweater-crossed sunglasses1 mustache3",s:"#fde8d8",h:"#fbbf24",c:"#6366f1",x:"#67e8f9"},
+  {n:"Bald Relaxed",a:"bald3 old sweater-crossed chinhair",s:"#a0522d",h:"#6b21a8",c:"#34d399",x:"#fb923c"},
+  {n:"Medium Indifferent",a:"medium3 awe shrug mustache3",s:"#fde8d8",h:"#92400e",c:"#fb7185",x:"#38bdf8"},
+  {n:"Mohawk Hipster",a:"mohawk1 talking striped-tee glasses1 mustache5",s:"#c68642",h:"#be185d",c:"#1e293b",x:"#fbbf24"},
+  {n:"Double Buns Indifferent",a:"buns serious shrug chinhair",s:"#f1c27d",h:"#3d2b1f",c:"#1e293b",x:"#67e8f9"},
+  {n:"Shaved Relaxed",a:"shaved1 driven sweater-crossed glasses4 beard3",s:"#f1c27d",h:"#111827",c:"#fbbf24",x:"#c084fc"},
+  {n:"Medium Bangs Hoodie Fan",a:"medium-bangs3 eyes-closed hoodie glasses1 mustache1",s:"#a0522d",h:"#d97706",c:"#059669",x:"#818cf8"},
+  {n:"Medium Bangs Energetic",a:"medium-bangs3 calm thunder-tee sunglasses1 mustache8",s:"#5c3317",h:"#7c3aed",c:"#ec4899",x:"#fb7185"},
+  {n:"Long Straight Chill",a:"long-straight gasp tee-crossed",s:"#deb887",h:"#7f1d1d",c:"#38bdf8",x:"#67e8f9"},
+  {n:"Mohawk Hipster",a:"mohawk2 angry striped-tee beard4",s:"#5c3317",h:"#374151",c:"#f97316",x:"#67e8f9"},
+  {n:"Twists Writer",a:"twists2 awe paper",s:"#5c3317",h:"#7c3aed",c:"#2dd4bf",x:"#f472b6"},
+  {n:"Long Curly Professional",a:"long-curly concerned-fear buttonup1 glasses2 mustache2",s:"#e0ac69",h:"#4b5563",c:"#7c3aed",x:"#34d399"},
+  {n:"Cornrows Energetic",a:"cornrows2 angry thunder-tee sunglasses2 chinhair",s:"#deb887",h:"#1c1917",c:"#ef4444",x:"#c084fc"},
+  {n:"Shaved Cool Kid",a:"shaved2 smile-gap jacket mustache5",s:"#5c3317",h:"#0369a1",c:"#059669",x:"#38bdf8"},
+  {n:"Flat Top Gamer",a:"flat-top1 smile-gap gaming eyepatch mustache7",s:"#c68642",h:"#6b21a8",c:"#db2777",x:"#2dd4bf"},
+  {n:"Short Scientist",a:"short4 suspicious shirt-coat",s:"#c68642",h:"#451a03",c:"#34d399",x:"#818cf8"},
+  {n:"Medium Gamer",a:"medium2 fear gaming glasses2 mustache1",s:"#e8b89a",h:"#d97706",c:"#e2e8f0",x:"#fbbf24"},
+  {n:"Medium Bangs Sports Fan",a:"medium-bangs3 cute sporty-tee",s:"#e0ac69",h:"#fbbf24",c:"#84cc16",x:"#e2e8f0"},
+  {n:"Bun Cozy",a:"bun1 eating-happy sweater-dots eyepatch mustache9",s:"#e0ac69",h:"#9ca3af",c:"#ec4899",x:"#34d399"},
+  {n:"Silver Medium Cozy",a:"gray-medium laughing sweater-dots",s:"#d4956a",h:"#111827",c:"#fb7185",x:"#fb923c"},
+  {n:"Medium Bangs Cozy",a:"medium-bangs2 old sweater-dots sunglasses2 beard2",s:"#deb887",h:"#3d2b1f",c:"#fb7185",x:"#38bdf8"},
+  {n:"Bun Intellectual",a:"bun1 blank turtleneck glasses5 mustache8",s:"#5c3317",h:"#0369a1",c:"#f97316",x:"#818cf8"},
+  {n:"Short Formal",a:"short3 talking buttonup2 glasses4",s:"#deb887",h:"#6d28d9",c:"#c084fc",x:"#38bdf8"},
+  {n:"Bun Professional",a:"bun1 laughing buttonup1 glasses3 mustache2",s:"#c68642",h:"#78350f",c:"#f472b6",x:"#fb923c"},
+  {n:"High Bun Athlete",a:"bun2 suspicious tank sunglasses2",s:"#c68642",h:"#374151",c:"#e2e8f0",x:"#818cf8"},
+  {n:"High Bun Presenter",a:"bun2 serious explaining glasses5 mustache7",s:"#fde8d8",h:"#fbbf24",c:"#6366f1",x:"#e2e8f0"},
+  {n:"Sierra Preppy",a:"sierra smile polo-sweater beard3",s:"#c68642",h:"#6d28d9",c:"#34d399",x:"#a78bfa"},
+  {n:"Long Afro Trendy",a:"long-afro sad polkadot-jacket mustache1",s:"#e8b89a",h:"#1e3a5f",c:"#ef4444",x:"#67e8f9"},
+  {n:"Long Afro Casual",a:"long-afro hectic striped-pocket-tee glasses5 mustache4",s:"#f5c5a3",h:"#be185d",c:"#c084fc",x:"#2dd4bf"},
+  {n:"Sierra Hoodie Fan",a:"sierra eyes-closed hoodie mustache5",s:"#5c3317",h:"#111827",c:"#84cc16",x:"#34d399"},
+  {n:"Bald Cool Kid",a:"bald3 smile-gap jacket glasses5 mustache6",s:"#f5c5a3",h:"#6d28d9",c:"#0284c7",x:"#fb923c"},
+  {n:"Bald Indifferent",a:"bald1 loving-grin1 shrug sunglasses1 mustache9",s:"#d4956a",h:"#111827",c:"#84cc16",x:"#2dd4bf"},
+  {n:"Mohawk Preppy",a:"mohawk1 driven polo-sweater glasses2",s:"#e0ac69",h:"#451a03",c:"#1e293b",x:"#38bdf8"},
+  {n:"Side Bangs Preppy",a:"bangs2 calm polo-sweater",s:"#deb887",h:"#111827",c:"#f97316",x:"#c084fc"},
+  {n:"Shaved Relaxed",a:"shaved1 peace sweater-crossed",s:"#deb887",h:"#451a03",c:"#0284c7",x:"#f472b6"},
+  {n:"Hijab Indifferent",a:"hijab gasp shrug glasses2",s:"#c68642",h:"#065f46",c:"#dc2626",x:"#38bdf8"},
+  {n:"Silver Bun Simple",a:"gray-bun eyes-closed tee2 glasses1 mustache8",s:"#f5c5a3",h:"#111827",c:"#f97316",x:"#fbbf24"},
+  {n:"Short Cozy",a:"short2 smile-big sweater-dots",s:"#e0ac69",h:"#6b21a8",c:"#2dd4bf",x:"#f472b6"},
+  {n:"Flat Top Hipster",a:"flat-top1 loving-grin1 striped-tee",s:"#a0522d",h:"#78350f",c:"#1e293b",x:"#38bdf8"},
+  {n:"Teddy Influencer",a:"teddy concerned-fear phone mustache2",s:"#fde8d8",h:"#fbbf24",c:"#f472b6",x:"#fb7185"},
+  {n:"Bald Preppy",a:"bald2 hectic polo-sweater eyepatch mustache7",s:"#8d5524",h:"#e2e8f0",c:"#06b6d4",x:"#34d399"},
+  {n:"Teddy Scientist",a:"teddy smile shirt-coat glasses4 mustache7",s:"#f1c27d",h:"#92400e",c:"#059669",x:"#f472b6"},
+  {n:"Short Presenter",a:"short1 driven explaining sunglasses1",s:"#e8b89a",h:"#451a03",c:"#7c3aed",x:"#a78bfa"},
+  {n:"Turban Indifferent",a:"turban suspicious shrug mustache5",s:"#d4956a",h:"#7c3aed",c:"#0ea5e9",x:"#38bdf8"},
+  {n:"Beanie Gamer",a:"beanie concerned-fear gaming beard3",s:"#e0ac69",h:"#7c3aed",c:"#1e293b",x:"#2dd4bf"},
+  {n:"Cornrows Energetic",a:"cornrows2 laughing thunder-tee glasses5 goatee1",s:"#a0522d",h:"#1c1917",c:"#1e293b",x:"#fb7185"},
+  {n:"Sierra Professional",a:"sierra cheeky buttonup1 glasses5 mustache2",s:"#8d5524",h:"#dc2626",c:"#e2e8f0",x:"#34d399"},
+  {n:"Bantu Knots Preppy",a:"bantu-knots tired polo-sweater glasses2",s:"#a0522d",h:"#3d2b1f",c:"#fb7185",x:"#fbbf24"},
+  {n:"Flat Top Executive",a:"flat-top1 awe blazer sunglasses1",s:"#fde8d8",h:"#451a03",c:"#84cc16",x:"#fbbf24"},
+  {n:"Shaved Cool Kid",a:"shaved2 eating-happy jacket mustache4",s:"#a0522d",h:"#16a34a",c:"#9333ea",x:"#c084fc"},
+  {n:"Medium Hipster",a:"medium2 monster striped-tee mustache5",s:"#a0522d",h:"#065f46",c:"#34d399",x:"#38bdf8"},
+  {n:"Turban Rebel",a:"turban smile-big killer glasses4 mustache2",s:"#e8b89a",h:"#111827",c:"#84cc16",x:"#e2e8f0"},
+  {n:"Shaved Chill",a:"shaved1 suspicious tee-crossed sunglasses2 mustache4",s:"#5c3317",h:"#451a03",c:"#10b981",x:"#fbbf24"},
+  {n:"Short Preppy",a:"short4 driven polo-sweater glasses2 mustache7",s:"#f1c27d",h:"#4b5563",c:"#f97316",x:"#67e8f9"},
+  {n:"Afro Developer",a:"afro eating-happy laptop",s:"#c68642",h:"#065f46",c:"#818cf8",x:"#67e8f9"},
+  {n:"Bantu Knots Developer",a:"bantu-knots fangry laptop goatee1",s:"#f5c5a3",h:"#6d28d9",c:"#38bdf8",x:"#c084fc"},
+  {n:"Medium Executive",a:"medium2 fear blazer glasses4 mustache4",s:"#f1c27d",h:"#6b21a8",c:"#fbbf24",x:"#e2e8f0"},
+  {n:"Flat Top Developer",a:"flat-top1 driven laptop",s:"#f5c5a3",h:"#e2e8f0",c:"#818cf8",x:"#2dd4bf"},
+  {n:"Mohawk Hoodie Fan",a:"mohawk1 cheeky hoodie sunglasses1 beard2",s:"#e8b89a",h:"#be185d",c:"#06b6d4",x:"#fb923c"},
+  {n:"Pompadour Intellectual",a:"pomp angry turtleneck sunglasses2 mustache1",s:"#e8b89a",h:"#dc2626",c:"#f59e0b",x:"#c084fc"},
+  {n:"Cornrows Scientist",a:"cornrows1 peace shirt-coat mustache5",s:"#8d5524",h:"#065f46",c:"#0284c7",x:"#e2e8f0"},
+  {n:"Bangs Cozy",a:"bangs1 fear sweater-dots mustache4",s:"#f5c5a3",h:"#4b5563",c:"#059669",x:"#818cf8"},
+  {n:"High Bun Everyday",a:"bun2 suspicious tee1 glasses4 mustache9",s:"#e8b89a",h:"#065f46",c:"#f472b6",x:"#34d399"},
+  {n:"Bald Coffee Lover",a:"bald3 blank coffee beard2",s:"#fde8d8",h:"#374151",c:"#e2e8f0",x:"#67e8f9"},
+  {n:"Medium Chill",a:"medium1 blank tee-crossed glasses4",s:"#deb887",h:"#92400e",c:"#9333ea",x:"#a78bfa"},
+  {n:"High Bun Rebel",a:"bun2 loving-grin1 killer mustache5",s:"#e0ac69",h:"#1c1917",c:"#14b8a6",x:"#f472b6"},
+  {n:"Short Influencer",a:"short3 cute phone",s:"#f5c5a3",h:"#111827",c:"#059669",x:"#a78bfa"},
+  {n:"Double Buns Energetic",a:"buns laughing thunder-tee glasses2 beard2",s:"#c68642",h:"#7c3aed",c:"#db2777",x:"#67e8f9"},
+  {n:"Long Afro Trendy",a:"long-afro smile-big polkadot-jacket sunglasses1 mustache9",s:"#c68642",h:"#3d2b1f",c:"#14b8a6",x:"#67e8f9"},
+  {n:"Long Straight Intellectual",a:"long-straight awe turtleneck glasses5 goatee2",s:"#d4956a",h:"#78350f",c:"#e2e8f0",x:"#818cf8"},
+  {n:"Medium Bangs Indifferent",a:"medium-bangs2 rage shrug sunglasses2 beard2",s:"#e8b89a",h:"#fbbf24",c:"#f472b6",x:"#67e8f9"},
+  {n:"Bald Writer",a:"bald3 fangry paper glasses5",s:"#c68642",h:"#16a34a",c:"#1e293b",x:"#818cf8"},
+  {n:"Twists Writer",a:"twists1 fear paper sunglasses2 goatee1",s:"#c68642",h:"#451a03",c:"#dc2626",x:"#a78bfa"},
+  {n:"Flat Top Fashionista",a:"flat-top1 eyes-closed dress glasses1 goatee2",s:"#c68642",h:"#451a03",c:"#fbbf24",x:"#34d399"},
+  {n:"Flat Top Hoodie Fan",a:"flat-top1 gasp hoodie eyepatch beard2",s:"#c68642",h:"#92400e",c:"#ec4899",x:"#2dd4bf"},
+  {n:"Bangs Scientist",a:"bangs1 hectic shirt-coat chinhair",s:"#e8b89a",h:"#dc2626",c:"#dc2626",x:"#2dd4bf"},
+  {n:"Bantu Knots Writer",a:"bantu-knots driven paper glasses1",s:"#8d5524",h:"#4b5563",c:"#16a34a",x:"#818cf8"},
+  {n:"Twists Simple",a:"twists1 concerned-fear tee2",s:"#e0ac69",h:"#6b21a8",c:"#84cc16",x:"#818cf8"},
+  {n:"Teddy Scientist",a:"teddy eyes-closed shirt-coat glasses2",s:"#a0522d",h:"#16a34a",c:"#38bdf8",x:"#2dd4bf"},
+  {n:"Hijab Relaxed",a:"hijab calm sweater-crossed mustache8",s:"#5c3317",h:"#111827",c:"#34d399",x:"#818cf8"},
+  {n:"Medium Bangs Gamer",a:"medium-bangs3 eyes-closed gaming",s:"#e0ac69",h:"#0369a1",c:"#14b8a6",x:"#fb923c"},
+  {n:"Short Trendy",a:"short2 peace polkadot-jacket",s:"#fde8d8",h:"#dc2626",c:"#059669",x:"#f472b6"},
+  {n:"High Bun Energetic",a:"bun2 laughing thunder-tee glasses5 mustache2",s:"#e0ac69",h:"#78350f",c:"#fb923c",x:"#fb923c"},
+  {n:"Silver Bun Everyday",a:"gray-bun loving-grin2 tee1",s:"#d4956a",h:"#fbbf24",c:"#f97316",x:"#fb923c"},
+  {n:"Shaved Preppy",a:"shaved1 eyes-closed polo-sweater",s:"#e0ac69",h:"#dc2626",c:"#ec4899",x:"#a78bfa"},
+  {n:"Flat Top Cool Kid",a:"flat-top2 loving-grin2 jacket sunglasses2 mustache2",s:"#fde8d8",h:"#6b21a8",c:"#ef4444",x:"#67e8f9"},
+  {n:"Side Bangs Developer",a:"bangs2 suspicious laptop eyepatch mustache7",s:"#e8b89a",h:"#9ca3af",c:"#f59e0b",x:"#a78bfa"},
+  {n:"Silver Bun Hipster",a:"gray-bun old striped-tee glasses5 beard4",s:"#d4956a",h:"#1c1917",c:"#f472b6",x:"#e2e8f0"},
+  {n:"Bangs Leader",a:"bangs1 fear pointing-up glasses1",s:"#d4956a",h:"#1c1917",c:"#0f172a",x:"#e2e8f0"},
+  {n:"Beanie Trendy",a:"beanie serious polkadot-jacket glasses1 beard3",s:"#e8b89a",h:"#e2e8f0",c:"#db2777",x:"#e2e8f0"},
+  {n:"Mohawk Simple",a:"mohawk2 calm tee2 glasses5 chinhair",s:"#f1c27d",h:"#1c1917",c:"#f97316",x:"#f472b6"},
+  {n:"High Bun Preppy",a:"bun2 smile-gap polo-sweater mustache4",s:"#d4956a",h:"#fbbf24",c:"#db2777",x:"#67e8f9"},
+  {n:"Turban Intellectual",a:"turban peace turtleneck goatee1",s:"#f1c27d",h:"#78350f",c:"#f97316",x:"#fbbf24"},
+  {n:"Medium Bangs Executive",a:"medium-bangs3 sad blazer glasses5",s:"#d4956a",h:"#9ca3af",c:"#059669",x:"#fb7185"},
+  {n:"Bald Athlete",a:"bald2 concerned-fear tank glasses1",s:"#5c3317",h:"#451a03",c:"#fb923c",x:"#2dd4bf"},
+  {n:"Medium Bangs Relaxed",a:"medium-bangs1 driven sweater-crossed glasses2 mustache1",s:"#c68642",h:"#3d2b1f",c:"#06b6d4",x:"#a78bfa"},
+  {n:"Cornrows Relaxed",a:"cornrows2 driven sweater-crossed mustache9",s:"#a0522d",h:"#065f46",c:"#f97316",x:"#38bdf8"},
+  {n:"Medium Bangs Preppy",a:"medium-bangs2 calm polo-sweater sunglasses1 mustache4",s:"#f5c5a3",h:"#111827",c:"#c084fc",x:"#38bdf8"},
+  {n:"Bantu Knots Preppy",a:"bantu-knots loving-grin1 polo-sweater sunglasses2 beard2",s:"#fde8d8",h:"#065f46",c:"#fbbf24",x:"#67e8f9"},
+  {n:"Twists Leader",a:"twists1 loving-grin2 pointing-up sunglasses2 goatee2",s:"#e0ac69",h:"#7f1d1d",c:"#f97316",x:"#c084fc"},
+  {n:"Bantu Knots Trendy",a:"bantu-knots smile polkadot-jacket glasses3",s:"#f5c5a3",h:"#7f1d1d",c:"#c084fc",x:"#38bdf8"},
+  {n:"Shaved Athlete",a:"shaved3 loving-grin1 tank",s:"#c68642",h:"#fbbf24",c:"#34d399",x:"#34d399"},
+  {n:"Shaved Hoodie Fan",a:"shaved2 cute hoodie mustache8",s:"#f1c27d",h:"#16a34a",c:"#14b8a6",x:"#fbbf24"},
+  {n:"Twists Formal",a:"twists1 blank buttonup2 sunglasses2 mustache2",s:"#e0ac69",h:"#e2e8f0",c:"#1e293b",x:"#fb923c"},
+  {n:"Medium Bangs Cozy",a:"medium-bangs3 cyclops sweater-dots glasses1",s:"#e8b89a",h:"#16a34a",c:"#34d399",x:"#2dd4bf"},
+  {n:"Long Curly Trendy",a:"long-curly cyclops polkadot-jacket",s:"#e8b89a",h:"#0369a1",c:"#7c3aed",x:"#e2e8f0"},
+  {n:"Teddy Relaxed",a:"teddy eating-happy sweater-crossed glasses4 beard1",s:"#a0522d",h:"#6b21a8",c:"#db2777",x:"#fbbf24"},
+  {n:"Medium Bangs Professional",a:"medium-bangs1 blank buttonup1 glasses5 mustache1",s:"#a0522d",h:"#451a03",c:"#dc2626",x:"#fb923c"},
+  {n:"Turban Hipster",a:"turban monster striped-tee glasses5 goatee2",s:"#5c3317",h:"#16a34a",c:"#059669",x:"#67e8f9"},
+  {n:"Short Developer",a:"short3 cheeky laptop",s:"#deb887",h:"#4b5563",c:"#818cf8",x:"#fb923c"},
+  {n:"Medium Presenter",a:"medium3 smile-big explaining glasses2 beard3",s:"#f1c27d",h:"#fbbf24",c:"#0ea5e9",x:"#2dd4bf"},
+  {n:"Long Afro Executive",a:"long-afro driven blazer glasses4",s:"#d4956a",h:"#be185d",c:"#db2777",x:"#e2e8f0"},
+  {n:"Shaved Simple",a:"shaved2 calm tee2 glasses4 mustache5",s:"#f1c27d",h:"#dc2626",c:"#06b6d4",x:"#fb7185"},
+  {n:"Bangs Trendy",a:"bangs1 old polkadot-jacket mustache2",s:"#deb887",h:"#3d2b1f",c:"#7c3aed",x:"#a78bfa"},
+  {n:"Twists Intellectual",a:"twists1 angry turtleneck sunglasses2 goatee2",s:"#f1c27d",h:"#fbbf24",c:"#06b6d4",x:"#67e8f9"},
+  {n:"Silver Short Cozy",a:"gray-short suspicious sweater-dots glasses2 mustache3",s:"#e0ac69",h:"#e2e8f0",c:"#34d399",x:"#c084fc"},
+  {n:"Flat Top Energetic",a:"flat-top1 cyclops thunder-tee mustache4",s:"#8d5524",h:"#92400e",c:"#0284c7",x:"#f472b6"},
+  {n:"Short Fashionista",a:"short1 rage dress eyepatch",s:"#f1c27d",h:"#92400e",c:"#34d399",x:"#67e8f9"},
+  {n:"Medium Hoodie Fan",a:"medium1 smile-big hoodie glasses1 goatee1",s:"#c68642",h:"#78350f",c:"#818cf8",x:"#fb923c"},
+  {n:"Long Straight Developer",a:"long-straight peace laptop glasses2",s:"#fde8d8",h:"#e2e8f0",c:"#0284c7",x:"#fbbf24"},
+  {n:"Shaved Trendy",a:"shaved2 peace polkadot-jacket eyepatch goatee1",s:"#e8b89a",h:"#d97706",c:"#818cf8",x:"#67e8f9"},
+  {n:"Short Writer",a:"short1 calm paper mustache3",s:"#d4956a",h:"#d97706",c:"#84cc16",x:"#c084fc"},
+  {n:"Short Executive",a:"short1 awe blazer",s:"#f1c27d",h:"#9ca3af",c:"#fb923c",x:"#34d399"},
+  {n:"Mohawk Leader",a:"mohawk1 eyes-closed pointing-up glasses1 mustache5",s:"#fde8d8",h:"#fbbf24",c:"#06b6d4",x:"#e2e8f0"},
+  {n:"Silver Short Cozy",a:"gray-short cheeky sweater-dots mustache4",s:"#c68642",h:"#1e3a5f",c:"#059669",x:"#2dd4bf"},
+  {n:"Short Cozy",a:"short1 tired sweater-dots sunglasses1",s:"#f1c27d",h:"#92400e",c:"#2dd4bf",x:"#38bdf8"},
+  {n:"Turban Hipster",a:"turban cute striped-tee mustache8",s:"#d4956a",h:"#065f46",c:"#fb7185",x:"#67e8f9"},
+  {n:"Bangs Developer",a:"bangs1 laughing laptop beard2",s:"#5c3317",h:"#78350f",c:"#c084fc",x:"#67e8f9"},
+  {n:"Medium Rebel",a:"medium1 sad killer chinhair",s:"#deb887",h:"#6b21a8",c:"#fb923c",x:"#fb923c"},
+  {n:"Hijab Simple",a:"hijab calm tee2 mustache8",s:"#f1c27d",h:"#7f1d1d",c:"#0ea5e9",x:"#e2e8f0"},
+  {n:"High Bun Sports Fan",a:"bun2 gasp sporty-tee chinhair",s:"#c68642",h:"#fbbf24",c:"#c084fc",x:"#38bdf8"},
+  {n:"Pompadour Leader",a:"pomp cheeky pointing-up mustache2",s:"#deb887",h:"#fbbf24",c:"#10b981",x:"#e2e8f0"},
+  {n:"Medium Sports Fan",a:"medium1 fangry sporty-tee eyepatch",s:"#f5c5a3",h:"#e2e8f0",c:"#2dd4bf",x:"#fb7185"},
+  {n:"High Bun Presenter",a:"bun2 peace explaining sunglasses1 beard1",s:"#e0ac69",h:"#111827",c:"#f59e0b",x:"#fb7185"},
+  {n:"Medium Scientist",a:"medium2 fear shirt-coat sunglasses1 mustache6",s:"#c68642",h:"#0369a1",c:"#db2777",x:"#e2e8f0"},
+  {n:"Mohawk Indifferent",a:"mohawk1 smile-gap shrug mustache6",s:"#f1c27d",h:"#6b21a8",c:"#6366f1",x:"#fb923c"},
+  {n:"Short Writer",a:"short1 fear paper beard1",s:"#a0522d",h:"#7f1d1d",c:"#818cf8",x:"#818cf8"},
+  {n:"Silver Medium Fashionista",a:"gray-medium peace dress glasses3 mustache3",s:"#fde8d8",h:"#6d28d9",c:"#db2777",x:"#c084fc"},
+  {n:"Bangs Gamer",a:"bangs1 cheeky gaming",s:"#f5c5a3",h:"#e2e8f0",c:"#db2777",x:"#e2e8f0"},
+  {n:"Silver Medium Casual",a:"gray-medium concerned-fear striped-pocket-tee beard3",s:"#f1c27d",h:"#0369a1",c:"#f472b6",x:"#fb7185"},
+  {n:"Medium Bangs Simple",a:"medium-bangs2 concerned-fear tee2 chinhair",s:"#5c3317",h:"#3d2b1f",c:"#db2777",x:"#fbbf24"},
+  {n:"Long Straight Writer",a:"long-straight fangry paper glasses1 beard3",s:"#d4956a",h:"#4b5563",c:"#f59e0b",x:"#67e8f9"},
+  {n:"Bun Energetic",a:"bun1 angry thunder-tee chinhair",s:"#f1c27d",h:"#78350f",c:"#2dd4bf",x:"#c084fc"},
+  {n:"Twists Intellectual",a:"twists2 blank turtleneck",s:"#f1c27d",h:"#7c3aed",c:"#9333ea",x:"#c084fc"},
+  {n:"Cornrows Fan",a:"cornrows2 smile tee-selena glasses5 mustache1",s:"#fde8d8",h:"#7c3aed",c:"#34d399",x:"#2dd4bf"},
+  {n:"Medium Straight Cozy",a:"medium-straight laughing sweater-dots glasses4 beard4",s:"#a0522d",h:"#1e3a5f",c:"#f97316",x:"#34d399"},
+  {n:"Medium Bangs Presenter",a:"medium-bangs1 tired explaining glasses1 mustache7",s:"#fde8d8",h:"#0369a1",c:"#38bdf8",x:"#f472b6"},
+  {n:"Long Curly Intellectual",a:"long-curly concerned-fear turtleneck glasses1",s:"#deb887",h:"#d97706",c:"#16a34a",x:"#e2e8f0"},
+  {n:"Medium Bangs Cozy",a:"medium-bangs1 eyes-closed sweater-dots glasses2 mustache3",s:"#f1c27d",h:"#6b21a8",c:"#f472b6",x:"#34d399"},
+  {n:"Cornrows Trendy",a:"cornrows1 sad polkadot-jacket",s:"#f5c5a3",h:"#d97706",c:"#818cf8",x:"#c084fc"},
+  {n:"Bald Presenter",a:"bald2 eyes-closed explaining",s:"#c68642",h:"#7c3aed",c:"#ec4899",x:"#c084fc"},
+  {n:"Bun Rebel",a:"bun1 blank killer chinhair",s:"#fde8d8",h:"#451a03",c:"#0284c7",x:"#2dd4bf"},
+  {n:"Bun Leader",a:"bun1 eyes-closed pointing-up sunglasses1",s:"#e0ac69",h:"#6b21a8",c:"#fb923c",x:"#fb7185"},
+  {n:"Cornrows Energetic",a:"cornrows1 old thunder-tee goatee1",s:"#d4956a",h:"#6d28d9",c:"#84cc16",x:"#67e8f9"},
+  {n:"Twists Developer",a:"twists2 serious laptop",s:"#f1c27d",h:"#6b21a8",c:"#2dd4bf",x:"#34d399"},
+  {n:"Bangs Influencer",a:"bangs1 loving-grin1 phone glasses4",s:"#f5c5a3",h:"#1c1917",c:"#2dd4bf",x:"#fb7185"},
+  {n:"Flat Top Casual",a:"flat-top2 awe striped-pocket-tee glasses3",s:"#a0522d",h:"#7c3aed",c:"#0f172a",x:"#fb7185"},
+  {n:"Long Straight Influencer",a:"long-straight suspicious phone glasses4",s:"#c68642",h:"#065f46",c:"#059669",x:"#38bdf8"},
+  {n:"Twists Intellectual",a:"twists2 hectic turtleneck glasses1 beard3",s:"#fde8d8",h:"#065f46",c:"#059669",x:"#f472b6"},
+  {n:"Medium Bangs Formal",a:"medium-bangs3 peace buttonup2 glasses5 mustache1",s:"#f5c5a3",h:"#d97706",c:"#f59e0b",x:"#818cf8"},
+  {n:"Short Energetic",a:"short2 hectic thunder-tee glasses2 mustache3",s:"#d4956a",h:"#3d2b1f",c:"#db2777",x:"#fb7185"},
+  {n:"Silver Bun Preppy",a:"gray-bun hectic polo-sweater",s:"#d4956a",h:"#d97706",c:"#84cc16",x:"#fbbf24"},
+  {n:"Long Curly Developer",a:"long-curly serious laptop glasses2 beard4",s:"#a0522d",h:"#7c3aed",c:"#84cc16",x:"#fb923c"},
+  {n:"Shaved Influencer",a:"shaved3 suspicious phone eyepatch mustache4",s:"#f5c5a3",h:"#1e3a5f",c:"#0f172a",x:"#818cf8"},
+  {n:"Flat Top Chill",a:"flat-top2 gasp tee-crossed glasses5 mustache9",s:"#f5c5a3",h:"#d97706",c:"#0284c7",x:"#818cf8"},
+  {n:"Twists Simple",a:"twists1 fear tee2 mustache4",s:"#5c3317",h:"#be185d",c:"#16a34a",x:"#f472b6"},
+  {n:"Teddy Presenter",a:"teddy tired explaining eyepatch",s:"#deb887",h:"#451a03",c:"#9333ea",x:"#fb7185"},
+  {n:"Twists Influencer",a:"twists1 gasp phone sunglasses1",s:"#d4956a",h:"#111827",c:"#f97316",x:"#fbbf24"},
+  {n:"Pompadour Rebel",a:"pomp hectic killer glasses3 beard2",s:"#8d5524",h:"#451a03",c:"#6366f1",x:"#818cf8"},
+  {n:"Flat Top Fan",a:"flat-top1 hectic tee-selena glasses3 mustache8",s:"#c68642",h:"#0369a1",c:"#8b5cf6",x:"#e2e8f0"},
+  {n:"Cornrows Everyday",a:"cornrows2 angry tee1 glasses2 mustache4",s:"#e0ac69",h:"#e2e8f0",c:"#10b981",x:"#34d399"},
+  {n:"Medium Energetic",a:"medium1 cute thunder-tee glasses4 mustache6",s:"#e8b89a",h:"#374151",c:"#f97316",x:"#f472b6"},
+  {n:"Short Presenter",a:"short2 talking explaining glasses2 mustache1",s:"#d4956a",h:"#6d28d9",c:"#0f172a",x:"#fbbf24"},
+  {n:"Short Preppy",a:"short4 loving-grin1 polo-sweater",s:"#c68642",h:"#dc2626",c:"#34d399",x:"#818cf8"},
+  {n:"Twists Sports Fan",a:"twists2 gasp sporty-tee glasses1 mustache8",s:"#c68642",h:"#065f46",c:"#1e293b",x:"#fb923c"},
+  {n:"Short Simple",a:"short4 awe tee2 chinhair",s:"#f5c5a3",h:"#451a03",c:"#8b5cf6",x:"#38bdf8"},
+  {n:"Bald Simple",a:"bald1 concerned-fear tee2 mustache5",s:"#e8b89a",h:"#3d2b1f",c:"#0ea5e9",x:"#fbbf24"},
+  {n:"Silver Short Developer",a:"gray-short smile laptop mustache8",s:"#fde8d8",h:"#374151",c:"#db2777",x:"#f472b6"},
+  {n:"Bald Intellectual",a:"bald3 loving-grin1 turtleneck beard4",s:"#e8b89a",h:"#3d2b1f",c:"#0f172a",x:"#a78bfa"},
+  {n:"Afro Trendy",a:"afro sad polkadot-jacket mustache8",s:"#e8b89a",h:"#16a34a",c:"#fbbf24",x:"#a78bfa"},
+  {n:"Bald Fan",a:"bald3 cute tee-selena beard1",s:"#5c3317",h:"#1e3a5f",c:"#fb7185",x:"#a78bfa"},
+  {n:"Hijab Indifferent",a:"hijab laughing shrug glasses3 mustache9",s:"#fde8d8",h:"#9ca3af",c:"#e2e8f0",x:"#818cf8"},
+  {n:"Short Trendy",a:"short2 calm polkadot-jacket glasses3 beard2",s:"#c68642",h:"#1e3a5f",c:"#2dd4bf",x:"#38bdf8"},
+  {n:"Long Bangs Intellectual",a:"long-bangs cyclops turtleneck",s:"#c68642",h:"#451a03",c:"#dc2626",x:"#67e8f9"},
+  {n:"Short Fashionista",a:"short3 blank dress mustache7",s:"#d4956a",h:"#dc2626",c:"#fb7185",x:"#fbbf24"},
+  {n:"Cornrows Athlete",a:"cornrows1 tired tank beard2",s:"#f5c5a3",h:"#7f1d1d",c:"#0ea5e9",x:"#f472b6"},
+  {n:"Bald Cool Kid",a:"bald1 fangry jacket glasses1",s:"#e0ac69",h:"#d97706",c:"#fb923c",x:"#c084fc"},
+  {n:"Bangs Cool Kid",a:"bangs1 peace jacket",s:"#fde8d8",h:"#3d2b1f",c:"#6366f1",x:"#67e8f9"},
+  {n:"Bun Preppy",a:"bun1 fear polo-sweater glasses3 mustache6",s:"#5c3317",h:"#7c3aed",c:"#0284c7",x:"#34d399"},
+  {n:"Shaved Trendy",a:"shaved3 monster polkadot-jacket mustache9",s:"#5c3317",h:"#92400e",c:"#db2777",x:"#67e8f9"},
+  {n:"Shaved Everyday",a:"shaved1 concerned-fear tee1 glasses5",s:"#d4956a",h:"#1e3a5f",c:"#ef4444",x:"#fbbf24"},
+  {n:"Cornrows Relaxed",a:"cornrows1 fear sweater-crossed beard3",s:"#e0ac69",h:"#7f1d1d",c:"#2dd4bf",x:"#38bdf8"},
+  {n:"Long Afro Athlete",a:"long-afro serious tank",s:"#8d5524",h:"#fbbf24",c:"#0284c7",x:"#fb923c"},
+  {n:"Silver Bun Writer",a:"gray-bun fangry paper",s:"#a0522d",h:"#374151",c:"#0f172a",x:"#c084fc"},
+  {n:"Long Curly Preppy",a:"long-curly blank polo-sweater",s:"#fde8d8",h:"#4b5563",c:"#10b981",x:"#67e8f9"},
+  {n:"Bald Relaxed",a:"bald1 talking sweater-crossed mustache7",s:"#c68642",h:"#78350f",c:"#f59e0b",x:"#38bdf8"},
+  {n:"Beanie Fan",a:"beanie rage tee-selena",s:"#c68642",h:"#92400e",c:"#f97316",x:"#e2e8f0"},
+  {n:"Twists Leader",a:"twists1 calm pointing-up mustache4",s:"#d4956a",h:"#374151",c:"#c084fc",x:"#c084fc"},
+  {n:"Teddy Developer",a:"teddy angry laptop",s:"#f1c27d",h:"#d97706",c:"#0ea5e9",x:"#a78bfa"},
+  {n:"Long Straight Trendy",a:"long-straight loving-grin2 polkadot-jacket sunglasses1",s:"#c68642",h:"#e2e8f0",c:"#84cc16",x:"#a78bfa"},
+  {n:"Bangs Simple",a:"bangs1 smile-big tee2 sunglasses1",s:"#5c3317",h:"#16a34a",c:"#f59e0b",x:"#38bdf8"},
+  {n:"Afro Scientist",a:"afro eating-happy shirt-coat glasses5 mustache8",s:"#e8b89a",h:"#9ca3af",c:"#f59e0b",x:"#a78bfa"},
+  {n:"Shaved Trendy",a:"shaved2 smile-big polkadot-jacket mustache4",s:"#e0ac69",h:"#1c1917",c:"#ef4444",x:"#2dd4bf"},
+  {n:"Flat Top Preppy",a:"flat-top2 driven polo-sweater glasses3 mustache7",s:"#f5c5a3",h:"#7f1d1d",c:"#6366f1",x:"#818cf8"},
+  {n:"Long Curly Cool Kid",a:"long-curly hectic jacket glasses4 mustache7",s:"#e8b89a",h:"#fbbf24",c:"#0284c7",x:"#2dd4bf"},
+  {n:"Short Simple",a:"short5 peace tee2 mustache6",s:"#c68642",h:"#1c1917",c:"#f59e0b",x:"#fbbf24"},
+  {n:"High Bun Executive",a:"bun2 cute blazer eyepatch goatee2",s:"#fde8d8",h:"#374151",c:"#10b981",x:"#fbbf24"},
+  {n:"Double Buns Intellectual",a:"buns rage turtleneck",s:"#e8b89a",h:"#6b21a8",c:"#8b5cf6",x:"#f472b6"},
+  {n:"Cornrows Athlete",a:"cornrows1 cheeky tank eyepatch",s:"#5c3317",h:"#451a03",c:"#0f172a",x:"#f472b6"},
+  {n:"Beanie Athlete",a:"beanie laughing tank sunglasses2 beard3",s:"#d4956a",h:"#0369a1",c:"#fb923c",x:"#fb7185"},
+  {n:"Silver Bun Casual",a:"gray-bun sad striped-pocket-tee mustache7",s:"#e0ac69",h:"#1c1917",c:"#fb7185",x:"#fb923c"},
+  {n:"Hijab Intellectual",a:"hijab fangry turtleneck",s:"#f1c27d",h:"#0369a1",c:"#fb7185",x:"#fb7185"},
+  {n:"Long Straight Energetic",a:"long-straight fear thunder-tee eyepatch mustache4",s:"#fde8d8",h:"#3d2b1f",c:"#16a34a",x:"#38bdf8"},
+  {n:"Double Buns Preppy",a:"buns serious polo-sweater glasses5",s:"#e0ac69",h:"#78350f",c:"#6366f1",x:"#34d399"},
+  {n:"Twists Trendy",a:"twists2 calm polkadot-jacket glasses1",s:"#f1c27d",h:"#92400e",c:"#34d399",x:"#2dd4bf"},
+  {n:"Short Professional",a:"short5 sad buttonup1 glasses5 beard1",s:"#d4956a",h:"#78350f",c:"#fbbf24",x:"#34d399"},
+  {n:"Cornrows Gamer",a:"cornrows1 concerned-fear gaming mustache8",s:"#e0ac69",h:"#111827",c:"#818cf8",x:"#fbbf24"},
+  {n:"Long Straight Sports Fan",a:"long-straight sad sporty-tee eyepatch mustache6",s:"#a0522d",h:"#3d2b1f",c:"#38bdf8",x:"#818cf8"},
+  {n:"Short Coffee Lover",a:"short2 talking coffee sunglasses2 chinhair",s:"#a0522d",h:"#1e3a5f",c:"#059669",x:"#38bdf8"},
+  {n:"Silver Medium Simple",a:"gray-medium awe tee2 beard3",s:"#deb887",h:"#92400e",c:"#db2777",x:"#fbbf24"},
+  {n:"Medium Formal",a:"medium1 angry buttonup2 goatee1",s:"#8d5524",h:"#6b21a8",c:"#0ea5e9",x:"#67e8f9"},
+  {n:"Medium Bangs Trendy",a:"medium-bangs1 serious polkadot-jacket sunglasses2 chinhair",s:"#f5c5a3",h:"#374151",c:"#38bdf8",x:"#2dd4bf"},
+  {n:"Sierra Coffee Lover",a:"sierra angry coffee mustache5",s:"#5c3317",h:"#1c1917",c:"#38bdf8",x:"#fb923c"},
+  {n:"Shaved Casual",a:"shaved1 cheeky striped-pocket-tee eyepatch mustache3",s:"#a0522d",h:"#7c3aed",c:"#0f172a",x:"#34d399"},
+  {n:"Shaved Hipster",a:"shaved3 rage striped-tee mustache4",s:"#a0522d",h:"#e2e8f0",c:"#0ea5e9",x:"#e2e8f0"},
+  {n:"Mohawk Relaxed",a:"mohawk2 concerned-fear sweater-crossed beard1",s:"#f1c27d",h:"#065f46",c:"#2dd4bf",x:"#2dd4bf"},
+  {n:"Medium Bangs Everyday",a:"medium-bangs2 rage tee1 glasses3 mustache8",s:"#8d5524",h:"#1c1917",c:"#ec4899",x:"#a78bfa"},
+  {n:"Twists Coffee Lover",a:"twists1 sad coffee mustache7",s:"#e0ac69",h:"#be185d",c:"#14b8a6",x:"#a78bfa"},
+  {n:"Flat Top Trendy",a:"flat-top2 tired polkadot-jacket eyepatch goatee1",s:"#deb887",h:"#78350f",c:"#9333ea",x:"#c084fc"},
+  {n:"Silver Short Influencer",a:"gray-short loving-grin2 phone glasses4 mustache9",s:"#a0522d",h:"#7f1d1d",c:"#14b8a6",x:"#fb7185"},
+  {n:"Flat Top Everyday",a:"flat-top2 rage tee1 glasses1 goatee1",s:"#e0ac69",h:"#dc2626",c:"#dc2626",x:"#38bdf8"},
+  {n:"Teddy Everyday",a:"teddy angry tee1 sunglasses1",s:"#a0522d",h:"#1c1917",c:"#818cf8",x:"#f472b6"},
+  {n:"Medium Formal",a:"medium1 smile-big buttonup2 sunglasses2 mustache3",s:"#fde8d8",h:"#451a03",c:"#e2e8f0",x:"#2dd4bf"},
+  {n:"Cornrows Intellectual",a:"cornrows2 gasp turtleneck glasses4 goatee2",s:"#fde8d8",h:"#4b5563",c:"#84cc16",x:"#fbbf24"},
+  {n:"Turban Fan",a:"turban fear tee-selena",s:"#f1c27d",h:"#7c3aed",c:"#fb923c",x:"#67e8f9"},
+  {n:"Silver Short Presenter",a:"gray-short blank explaining glasses5 goatee1",s:"#8d5524",h:"#9ca3af",c:"#1e293b",x:"#38bdf8"},
+  {n:"Mohawk Fan",a:"mohawk2 smile-big tee-selena glasses3",s:"#5c3317",h:"#78350f",c:"#1e293b",x:"#38bdf8"},
+  {n:"Short Writer",a:"short5 loving-grin1 paper beard2",s:"#5c3317",h:"#3d2b1f",c:"#8b5cf6",x:"#fbbf24"},
+  {n:"Shaved Formal",a:"shaved2 blank buttonup2 beard2",s:"#f1c27d",h:"#1c1917",c:"#2dd4bf",x:"#a78bfa"},
+  {n:"Shaved Cool Kid",a:"shaved2 suspicious jacket mustache8",s:"#c68642",h:"#4b5563",c:"#dc2626",x:"#e2e8f0"},
+  {n:"Short Scientist",a:"short2 peace shirt-coat goatee1",s:"#5c3317",h:"#9ca3af",c:"#84cc16",x:"#fb923c"},
+  {n:"Shaved Intellectual",a:"shaved1 tired turtleneck sunglasses1 mustache7",s:"#fde8d8",h:"#e2e8f0",c:"#f59e0b",x:"#e2e8f0"},
+  {n:"Cornrows Intellectual",a:"cornrows1 fangry turtleneck glasses3",s:"#f1c27d",h:"#6d28d9",c:"#0284c7",x:"#f472b6"},
+  {n:"Twists Developer",a:"twists1 cyclops laptop mustache8",s:"#c68642",h:"#6b21a8",c:"#ef4444",x:"#fb923c"},
+  {n:"Medium Bangs Formal",a:"medium-bangs2 calm buttonup2 glasses1 mustache1",s:"#a0522d",h:"#9ca3af",c:"#14b8a6",x:"#67e8f9"},
+  {n:"Medium Casual",a:"medium1 calm striped-pocket-tee sunglasses1",s:"#8d5524",h:"#1c1917",c:"#9333ea",x:"#38bdf8"},
+  {n:"Medium Bangs Cool Kid",a:"medium-bangs2 fangry jacket beard3",s:"#e0ac69",h:"#78350f",c:"#818cf8",x:"#fb7185"},
+  {n:"Flat Top Relaxed",a:"flat-top1 eating-happy sweater-crossed glasses3 mustache2",s:"#e8b89a",h:"#7c3aed",c:"#1e293b",x:"#818cf8"},
+  {n:"Medium Bangs Leader",a:"medium-bangs1 rage pointing-up mustache1",s:"#5c3317",h:"#1e3a5f",c:"#6366f1",x:"#fb7185"},
+  {n:"Mohawk Cozy",a:"mohawk2 talking sweater-dots glasses1",s:"#d4956a",h:"#dc2626",c:"#2dd4bf",x:"#c084fc"},
+  {n:"Turban Cozy",a:"turban monster sweater-dots mustache5",s:"#e0ac69",h:"#6b21a8",c:"#9333ea",x:"#a78bfa"},
+  {n:"Silver Short Hipster",a:"gray-short suspicious striped-tee mustache4",s:"#c68642",h:"#3d2b1f",c:"#16a34a",x:"#38bdf8"},
+  {n:"Twists Simple",a:"twists2 cute tee2 goatee1",s:"#d4956a",h:"#3d2b1f",c:"#ef4444",x:"#38bdf8"},
+  {n:"Cornrows Preppy",a:"cornrows1 smile-big polo-sweater glasses4 mustache9",s:"#f1c27d",h:"#065f46",c:"#38bdf8",x:"#fb923c"},
+  {n:"Long Curly Hoodie Fan",a:"long-curly blank hoodie sunglasses2",s:"#f5c5a3",h:"#6b21a8",c:"#fb7185",x:"#fbbf24"},
+  {n:"Short Fashionista",a:"short4 loving-grin2 dress goatee1",s:"#e0ac69",h:"#92400e",c:"#34d399",x:"#fb923c"},
+  {n:"Shaved Sports Fan",a:"shaved2 fear sporty-tee goatee1",s:"#e8b89a",h:"#9ca3af",c:"#8b5cf6",x:"#38bdf8"},
+  {n:"Beanie Fashionista",a:"beanie fangry dress mustache1",s:"#e8b89a",h:"#92400e",c:"#7c3aed",x:"#2dd4bf"},
+  {n:"Medium Bangs Intellectual",a:"medium-bangs2 smile-gap turtleneck glasses2",s:"#f1c27d",h:"#0369a1",c:"#84cc16",x:"#fb7185"},
+  {n:"Long Straight Intellectual",a:"long-straight smile turtleneck glasses4 mustache4",s:"#c68642",h:"#065f46",c:"#f59e0b",x:"#38bdf8"},
+  {n:"Silver Bun Gamer",a:"gray-bun serious gaming eyepatch beard2",s:"#c68642",h:"#78350f",c:"#e2e8f0",x:"#fb7185"},
+  {n:"Short Scientist",a:"short5 eyes-closed shirt-coat chinhair",s:"#deb887",h:"#065f46",c:"#ef4444",x:"#c084fc"},
+  {n:"Shaved Simple",a:"shaved2 talking tee2 sunglasses1 beard4",s:"#8d5524",h:"#7f1d1d",c:"#818cf8",x:"#e2e8f0"},
+  {n:"Silver Medium Fashionista",a:"gray-medium eyes-closed dress",s:"#8d5524",h:"#dc2626",c:"#7c3aed",x:"#818cf8"},
+  {n:"Flat Top Relaxed",a:"flat-top1 angry sweater-crossed glasses1 goatee2",s:"#c68642",h:"#dc2626",c:"#9333ea",x:"#2dd4bf"},
+  {n:"Cornrows Presenter",a:"cornrows1 eating-happy explaining sunglasses1 mustache6",s:"#e0ac69",h:"#1c1917",c:"#db2777",x:"#34d399"},
+  {n:"Silver Medium Indifferent",a:"gray-medium fangry shrug sunglasses2 mustache8",s:"#f5c5a3",h:"#111827",c:"#db2777",x:"#34d399"},
+  {n:"Bun Cozy",a:"bun1 gasp sweater-dots eyepatch beard4",s:"#c68642",h:"#fbbf24",c:"#38bdf8",x:"#f472b6"},
+  {n:"Medium Cozy",a:"medium3 calm sweater-dots sunglasses2 beard1",s:"#d4956a",h:"#78350f",c:"#2dd4bf",x:"#a78bfa"},
+  {n:"Turban Athlete",a:"turban rage tank glasses5",s:"#e0ac69",h:"#1e3a5f",c:"#059669",x:"#2dd4bf"},
+  {n:"Short Everyday",a:"short5 fangry tee1 mustache3",s:"#5c3317",h:"#1e3a5f",c:"#06b6d4",x:"#818cf8"},
+  {n:"Teddy Simple",a:"teddy cheeky tee2",s:"#d4956a",h:"#7c3aed",c:"#10b981",x:"#a78bfa"},
+  {n:"Short Scientist",a:"short1 loving-grin2 shirt-coat beard3",s:"#f5c5a3",h:"#451a03",c:"#10b981",x:"#f472b6"},
+  {n:"Short Executive",a:"short3 eating-happy blazer mustache4",s:"#e8b89a",h:"#1c1917",c:"#0ea5e9",x:"#67e8f9"},
+  {n:"Bald Chill",a:"bald1 cheeky tee-crossed beard2",s:"#8d5524",h:"#6d28d9",c:"#db2777",x:"#fb7185"},
+  {n:"Silver Medium Relaxed",a:"gray-medium smile-big sweater-crossed eyepatch",s:"#8d5524",h:"#78350f",c:"#6366f1",x:"#fb923c"},
+  {n:"Medium Coffee Lover",a:"medium2 talking coffee beard2",s:"#f5c5a3",h:"#fbbf24",c:"#059669",x:"#2dd4bf"},
+  {n:"Bun Fashionista",a:"bun1 monster dress glasses5 mustache9",s:"#f1c27d",h:"#e2e8f0",c:"#f472b6",x:"#fb923c"},
+  {n:"Flat Top Executive",a:"flat-top1 cute blazer mustache5",s:"#5c3317",h:"#78350f",c:"#db2777",x:"#c084fc"},
+  {n:"Cornrows Hoodie Fan",a:"cornrows2 talking hoodie beard4",s:"#d4956a",h:"#6d28d9",c:"#1e293b",x:"#67e8f9"},
+  {n:"Bald Leader",a:"bald3 fangry pointing-up sunglasses2",s:"#d4956a",h:"#1e3a5f",c:"#6366f1",x:"#f472b6"},
+  {n:"Bangs Rebel",a:"bangs1 cute killer sunglasses2 mustache6",s:"#8d5524",h:"#065f46",c:"#84cc16",x:"#fb923c"},
+  {n:"Bantu Knots Chill",a:"bantu-knots smile-gap tee-crossed glasses1 mustache4",s:"#d4956a",h:"#dc2626",c:"#84cc16",x:"#f472b6"},
+  {n:"Shaved Fashionista",a:"shaved3 cyclops dress mustache9",s:"#e0ac69",h:"#0369a1",c:"#fb923c",x:"#fb923c"},
+  {n:"Flat Top Gamer",a:"flat-top2 smile-gap gaming glasses4",s:"#f1c27d",h:"#7f1d1d",c:"#ec4899",x:"#67e8f9"},
+  {n:"Long Afro Cozy",a:"long-afro blank sweater-dots sunglasses1 mustache2",s:"#deb887",h:"#dc2626",c:"#fbbf24",x:"#38bdf8"},
+  {n:"Bald Energetic",a:"bald1 serious thunder-tee glasses3 mustache2",s:"#c68642",h:"#6b21a8",c:"#0284c7",x:"#c084fc"},
+  {n:"Silver Short Everyday",a:"gray-short calm tee1 eyepatch mustache7",s:"#e0ac69",h:"#1c1917",c:"#fb7185",x:"#67e8f9"},
+  {n:"Short Coffee Lover",a:"short2 fear coffee",s:"#a0522d",h:"#be185d",c:"#7c3aed",x:"#67e8f9"},
+  {n:"Beanie Presenter",a:"beanie fear explaining sunglasses1 mustache7",s:"#fde8d8",h:"#065f46",c:"#fb7185",x:"#fb923c"},
+  {n:"Short Athlete",a:"short1 monster tank glasses5 mustache4",s:"#deb887",h:"#451a03",c:"#ec4899",x:"#38bdf8"},
+  {n:"Bald Executive",a:"bald2 fangry blazer",s:"#a0522d",h:"#0369a1",c:"#38bdf8",x:"#f472b6"},
+  {n:"Short Trendy",a:"short3 rage polkadot-jacket",s:"#f1c27d",h:"#7f1d1d",c:"#c084fc",x:"#34d399"},
+  {n:"Bantu Knots Chill",a:"bantu-knots eyes-closed tee-crossed sunglasses1",s:"#f1c27d",h:"#3d2b1f",c:"#14b8a6",x:"#fb7185"},
+  {n:"Bald Trendy",a:"bald2 blank polkadot-jacket glasses5 mustache3",s:"#8d5524",h:"#6b21a8",c:"#9333ea",x:"#a78bfa"},
+  {n:"Bald Preppy",a:"bald3 cyclops polo-sweater mustache8",s:"#fde8d8",h:"#78350f",c:"#16a34a",x:"#f472b6"},
+  {n:"Short Fan",a:"short5 driven tee-selena glasses1 mustache3",s:"#5c3317",h:"#111827",c:"#f59e0b",x:"#fb7185"},
+  {n:"Side Bangs Trendy",a:"bangs2 concerned-fear polkadot-jacket beard3",s:"#5c3317",h:"#374151",c:"#0284c7",x:"#818cf8"},
+  {n:"Cornrows Casual",a:"cornrows1 cute striped-pocket-tee glasses2 mustache9",s:"#d4956a",h:"#16a34a",c:"#f97316",x:"#a78bfa"},
+  {n:"Medium Everyday",a:"medium1 cyclops tee1 glasses2 mustache2",s:"#e8b89a",h:"#be185d",c:"#ef4444",x:"#a78bfa"},
+  {n:"Hijab Relaxed",a:"hijab laughing sweater-crossed glasses2 mustache9",s:"#5c3317",h:"#7f1d1d",c:"#0ea5e9",x:"#fbbf24"},
+  {n:"Side Bangs Cozy",a:"bangs2 calm sweater-dots mustache7",s:"#f1c27d",h:"#9ca3af",c:"#f472b6",x:"#a78bfa"},
+  {n:"Shaved Sports Fan",a:"shaved2 driven sporty-tee mustache3",s:"#f1c27d",h:"#16a34a",c:"#f472b6",x:"#2dd4bf"},
+  {n:"Sierra Intellectual",a:"sierra hectic turtleneck glasses4",s:"#f5c5a3",h:"#7c3aed",c:"#9333ea",x:"#a78bfa"},
+  {n:"High Bun Executive",a:"bun2 tired blazer goatee1",s:"#e0ac69",h:"#be185d",c:"#f97316",x:"#f472b6"},
+  {n:"Twists Writer",a:"twists1 loving-grin1 paper",s:"#a0522d",h:"#1e3a5f",c:"#0ea5e9",x:"#fbbf24"},
+  {n:"Mohawk Influencer",a:"mohawk2 smile phone sunglasses1 mustache7",s:"#e8b89a",h:"#78350f",c:"#ec4899",x:"#a78bfa"},
+  {n:"Mohawk Cool Kid",a:"mohawk1 old jacket mustache6",s:"#e8b89a",h:"#065f46",c:"#16a34a",x:"#818cf8"},
+  {n:"Cornrows Cozy",a:"cornrows1 fangry sweater-dots",s:"#f1c27d",h:"#1c1917",c:"#db2777",x:"#f472b6"},
+  {n:"Medium Formal",a:"medium3 old buttonup2 mustache5",s:"#a0522d",h:"#78350f",c:"#38bdf8",x:"#f472b6"},
+  {n:"Medium Straight Preppy",a:"medium-straight eyes-closed polo-sweater mustache2",s:"#8d5524",h:"#9ca3af",c:"#1e293b",x:"#c084fc"},
+  {n:"Mohawk Formal",a:"mohawk2 calm buttonup2 eyepatch",s:"#a0522d",h:"#92400e",c:"#fbbf24",x:"#a78bfa"},
+  {n:"Twists Developer",a:"twists1 talking laptop sunglasses1",s:"#8d5524",h:"#dc2626",c:"#34d399",x:"#f472b6"},
+  {n:"Bantu Knots Rebel",a:"bantu-knots gasp killer",s:"#f5c5a3",h:"#1c1917",c:"#dc2626",x:"#38bdf8"},
+  {n:"Silver Short Everyday",a:"gray-short talking tee1 sunglasses2 mustache8",s:"#e0ac69",h:"#7f1d1d",c:"#ef4444",x:"#a78bfa"},
+  {n:"Afro Trendy",a:"afro hectic polkadot-jacket glasses3 mustache3",s:"#a0522d",h:"#fbbf24",c:"#0f172a",x:"#818cf8"},
+  {n:"Short Presenter",a:"short5 old explaining sunglasses1",s:"#f5c5a3",h:"#1c1917",c:"#1e293b",x:"#fb923c"},
+  {n:"High Bun Trendy",a:"bun2 cute polkadot-jacket mustache8",s:"#d4956a",h:"#be185d",c:"#818cf8",x:"#fb923c"},
+  {n:"Hijab Cozy",a:"hijab old sweater-dots beard1",s:"#8d5524",h:"#065f46",c:"#c084fc",x:"#e2e8f0"},
+  {n:"Medium Straight Influencer",a:"medium-straight tired phone goatee1",s:"#e8b89a",h:"#dc2626",c:"#0ea5e9",x:"#c084fc"},
+  {n:"Shaved Preppy",a:"shaved3 cheeky polo-sweater mustache7",s:"#e8b89a",h:"#0369a1",c:"#06b6d4",x:"#818cf8"},
+  {n:"Medium Straight Chill",a:"medium-straight smile-gap tee-crossed mustache6",s:"#e0ac69",h:"#92400e",c:"#10b981",x:"#2dd4bf"},
+  {n:"Twists Professional",a:"twists1 smile buttonup1 mustache8",s:"#fde8d8",h:"#fbbf24",c:"#f59e0b",x:"#e2e8f0"},
+  {n:"Medium Bangs Sports Fan",a:"medium-bangs1 cheeky sporty-tee glasses5 beard2",s:"#f5c5a3",h:"#4b5563",c:"#059669",x:"#34d399"},
+  {n:"Twists Casual",a:"twists1 gasp striped-pocket-tee eyepatch mustache5",s:"#c68642",h:"#111827",c:"#7c3aed",x:"#fb923c"},
+  {n:"Shaved Chill",a:"shaved2 calm tee-crossed glasses2",s:"#e8b89a",h:"#fbbf24",c:"#8b5cf6",x:"#fb923c"},
+  {n:"Sierra Preppy",a:"sierra serious polo-sweater mustache1",s:"#f1c27d",h:"#3d2b1f",c:"#6366f1",x:"#67e8f9"},
+  {n:"Beanie Fashionista",a:"beanie eating-happy dress mustache6",s:"#f1c27d",h:"#be185d",c:"#fb7185",x:"#fb923c"},
+  {n:"Silver Short Coffee Lover",a:"gray-short cute coffee glasses2 beard1",s:"#e0ac69",h:"#374151",c:"#ef4444",x:"#fbbf24"},
+  {n:"Hijab Indifferent",a:"hijab smile-big shrug glasses2",s:"#f1c27d",h:"#6d28d9",c:"#ef4444",x:"#38bdf8"},
+  {n:"Bald Fashionista",a:"bald2 eyes-closed dress",s:"#f5c5a3",h:"#111827",c:"#fb7185",x:"#fbbf24"},
+  {n:"Long Bangs Cozy",a:"long-bangs calm sweater-dots chinhair",s:"#5c3317",h:"#111827",c:"#fbbf24",x:"#f472b6"},
+  {n:"Beanie Trendy",a:"beanie cute polkadot-jacket mustache3",s:"#e8b89a",h:"#374151",c:"#10b981",x:"#2dd4bf"},
+  {n:"Medium Bangs Cool Kid",a:"medium-bangs1 smile jacket beard3",s:"#a0522d",h:"#0369a1",c:"#f97316",x:"#2dd4bf"},
+  {n:"Medium Straight Intellectual",a:"medium-straight laughing turtleneck glasses1 goatee1",s:"#c68642",h:"#111827",c:"#0284c7",x:"#67e8f9"},
+  {n:"Silver Bun Gamer",a:"gray-bun loving-grin1 gaming goatee1",s:"#c68642",h:"#065f46",c:"#fb7185",x:"#e2e8f0"},
+  {n:"Bantu Knots Indifferent",a:"bantu-knots tired shrug mustache9",s:"#f1c27d",h:"#3d2b1f",c:"#0284c7",x:"#a78bfa"},
+  {n:"Short Relaxed",a:"short1 fangry sweater-crossed glasses3 goatee1",s:"#fde8d8",h:"#0369a1",c:"#8b5cf6",x:"#fbbf24"},
+  {n:"Medium Bangs Writer",a:"medium-bangs3 calm paper goatee2",s:"#c68642",h:"#111827",c:"#818cf8",x:"#38bdf8"},
+  {n:"Long Straight Gamer",a:"long-straight peace gaming glasses1 beard4",s:"#c68642",h:"#1e3a5f",c:"#2dd4bf",x:"#fbbf24"},
+  {n:"Short Everyday",a:"short2 tired tee1 glasses1",s:"#e0ac69",h:"#fbbf24",c:"#ef4444",x:"#38bdf8"},
+  {n:"Cornrows Hipster",a:"cornrows2 serious striped-tee glasses5",s:"#d4956a",h:"#6d28d9",c:"#c084fc",x:"#818cf8"},
+  {n:"Silver Medium Presenter",a:"gray-medium fear explaining",s:"#c68642",h:"#374151",c:"#ec4899",x:"#67e8f9"},
+  {n:"Mohawk Developer",a:"mohawk2 sad laptop beard1",s:"#c68642",h:"#92400e",c:"#fbbf24",x:"#fbbf24"},
+  {n:"Cornrows Indifferent",a:"cornrows1 eating-happy shrug eyepatch beard1",s:"#c68642",h:"#0369a1",c:"#34d399",x:"#38bdf8"},
+  {n:"Long Curly Hipster",a:"long-curly gasp striped-tee",s:"#e8b89a",h:"#6b21a8",c:"#38bdf8",x:"#c084fc"},
+  {n:"Long Afro Preppy",a:"long-afro rage polo-sweater goatee1",s:"#c68642",h:"#7f1d1d",c:"#fb923c",x:"#f472b6"},
+  {n:"Teddy Leader",a:"teddy eating-happy pointing-up glasses1 mustache6",s:"#c68642",h:"#fbbf24",c:"#06b6d4",x:"#f472b6"},
+  {n:"High Bun Intellectual",a:"bun2 sad turtleneck mustache6",s:"#deb887",h:"#451a03",c:"#ef4444",x:"#c084fc"},
+  {n:"Medium Executive",a:"medium3 gasp blazer glasses2 mustache3",s:"#8d5524",h:"#451a03",c:"#14b8a6",x:"#a78bfa"},
+  {n:"Cornrows Rebel",a:"cornrows2 smile-gap killer goatee1",s:"#deb887",h:"#dc2626",c:"#7c3aed",x:"#38bdf8"},
+  {n:"Medium Bangs Chill",a:"medium-bangs1 blank tee-crossed eyepatch",s:"#e8b89a",h:"#065f46",c:"#9333ea",x:"#a78bfa"},
+  {n:"Flat Top Fashionista",a:"flat-top2 peace dress glasses2 mustache7",s:"#deb887",h:"#451a03",c:"#ec4899",x:"#fb7185"},
+  {n:"Teddy Rebel",a:"teddy angry killer glasses2 mustache4",s:"#e8b89a",h:"#6b21a8",c:"#0ea5e9",x:"#818cf8"},
+  {n:"High Bun Casual",a:"bun2 eyes-closed striped-pocket-tee mustache2",s:"#d4956a",h:"#4b5563",c:"#ec4899",x:"#818cf8"},
+  {n:"Short Cool Kid",a:"short2 eyes-closed jacket sunglasses2 goatee2",s:"#a0522d",h:"#1e3a5f",c:"#6366f1",x:"#38bdf8"},
+  {n:"Long Curly Writer",a:"long-curly cheeky paper glasses3 mustache2",s:"#f5c5a3",h:"#7f1d1d",c:"#8b5cf6",x:"#c084fc"},
+  {n:"Cornrows Simple",a:"cornrows1 angry tee2 mustache6",s:"#8d5524",h:"#fbbf24",c:"#10b981",x:"#fbbf24"},
+  {n:"Twists Influencer",a:"twists2 awe phone eyepatch",s:"#e8b89a",h:"#7f1d1d",c:"#34d399",x:"#e2e8f0"},
+  {n:"Long Straight Formal",a:"long-straight monster buttonup2 glasses2 mustache9",s:"#c68642",h:"#92400e",c:"#ef4444",x:"#fb7185"},
+  {n:"Flat Top Scientist",a:"flat-top2 smile-big shirt-coat glasses4",s:"#fde8d8",h:"#9ca3af",c:"#14b8a6",x:"#38bdf8"}
+];
+
+// Virtual rendering for peeps — 60 per page
+let peepsRendered = 0;
+const PEEPS_PAGE = 60;
+let peepsObserver;
+
+function buildPeepsGrid() {
+  const grid = document.getElementById('peepsGrid');
+  grid.innerHTML = '';
+  peepsRendered = 0;
+  renderPeepsPage();
+  observePeepsSentinel();
+}
+
+function renderPeepsPage() {
+  if (peepsRendered >= PEEPS.length) {
+    const s = document.getElementById('peeps-sentinel');
+    if (s) s.style.display = 'none';
+    return;
+  }
+  const grid = document.getElementById('peepsGrid');
+  const slice = PEEPS.slice(peepsRendered, peepsRendered + PEEPS_PAGE);
+  peepsRendered += slice.length;
+  const startIdx = peepsRendered - slice.length;
+
+  slice.forEach((p, i) => {
+    const idx = startIdx + i;
+    const card = document.createElement('div');
+    card.className = 'peep-card';
+    card.innerHTML = `
+      <div class="peep-preview">
+        <div data-css-peeps="${p.a}" style="--peep-skin-color:${p.s};--peep-hair-color:${p.h};--peep-clothes-color:${p.c};--peep-accessory-color:${p.x};--peep-hat-color:${p.c};--peep-object-color:${p.x};--peep-facial-hair-color:${p.h};"></div>
+      </div>
+      <div class="peep-footer">
+        <div class="peep-name">${p.n}</div>
+        <div class="peep-actions">
+          <button class="peep-btn" onclick="copyPeepHTML(${idx},this)">Copy HTML</button>
+          <button class="peep-btn" onclick="copyPeepCSS(${idx},this)">Copy CSS</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  let sentinel = document.getElementById('peeps-sentinel');
+  if (!sentinel) {
+    sentinel = document.createElement('div');
+    sentinel.id = 'peeps-sentinel';
+    sentinel.style.cssText = 'text-align:center;padding:16px;font-size:11px;color:rgba(255,255,255,0.2);';
+    document.getElementById('peepsSection').appendChild(sentinel);
+  }
+  if (peepsRendered < PEEPS.length) {
+    sentinel.style.display = 'block';
+    sentinel.textContent = `Showing ${peepsRendered} of ${PEEPS.length} peeps — scroll for more`;
+  } else {
+    sentinel.style.display = 'none';
+  }
+}
+
+function observePeepsSentinel() {
+  if (peepsObserver) peepsObserver.disconnect();
+  peepsObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) renderPeepsPage();
+  }, { rootMargin: '400px' });
+  const s = document.getElementById('peeps-sentinel');
+  if (s) peepsObserver.observe(s);
+}
+
+window.copyPeepHTML = function(i, btn) {
+  const p = PEEPS[i];
+  const code = `<div data-css-peeps="${p.a}" style="width:120px;height:130px;--peep-skin-color:${p.s};--peep-hair-color:${p.h};--peep-clothes-color:${p.c};--peep-accessory-color:${p.x};"></div>`;
+  navigator.clipboard.writeText(code).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+    showToast('HTML copied!');
+  });
+};
+
+window.copyPeepCSS = function(i, btn) {
+  const p = PEEPS[i];
+  const code = `/* 1. Add to your <head> */\n/* <link rel="stylesheet" type="text/css" href="https://unpkg.com/css-peeps@1/css-peeps.css"> */\n\n/* 2. ${p.n} — css-peeps */\n[data-css-peeps] {\n  --peep-skin-color: ${p.s};\n  --peep-hair-color: ${p.h};\n  --peep-clothes-color: ${p.c};\n  --peep-accessory-color: ${p.x};\n  width: 120px;\n  height: 130px;\n}`;
+  navigator.clipboard.writeText(code).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+    showToast('CSS copied!');
+  });
+};
+
+buildPeepsGrid();
+</script>
+
+<script>(function(){const canvas=document.getElementById('bg-canvas');const gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');if(!gl)return;let mouse={x:.5,y:.5},sm={x:.5,y:.5};function resize(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}window.addEventListener('resize',resize);window.addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight;});const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;const fs=`precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float ray(vec2 src,vec2 dir,vec2 c,float a,float b,float s){vec2 d=c-src;vec2 dn=normalize(d);float ca=dot(dn,dir);float sp=pow(max(ca,0.),6.);float dist=length(d);float f=clamp((r.x*2.-dist)/(r.x*2.),0.,1.);float pulse=.7+.3*sin(t*s+ca*a);float base=clamp(.45+.15*sin(ca*a+t*s)+.3+.2*cos(-ca*b+t*s),0.,1.);return base*f*sp*pulse;}void main(){vec2 c=vec2(gl_FragCoord.x,r.y-gl_FragCoord.y);vec2 src=vec2(r.x*(.5+(m.x-.5)*.12),-r.y*.04);vec2 dir=normalize(vec2((m.x-.5)*.18,1.));float rays=ray(src,dir,c,36.22,21.11,1.5)*.55+ray(src,dir,c,22.4,18.02,1.1)*.4;vec3 col=rays*vec3(.55,.52,1.);col*=.15+(1.-c.y/r.y)*.85;float star=0.;for(int i=0;i<3;i++){vec2 cell=floor(c/(80.+float(i)*40.));vec2 h2=vec2(h(cell+float(i)*7.3),h(cell+float(i)*13.7));vec2 sp=(cell+h2)*(80.+float(i)*40.);float d=length(c-sp);float tw=.5+.5*sin(t*(1.5+h2.x*3.)+h2.y*6.28);star+=tw*smoothstep(1.8,0.,d)*(.3+h2.x*.7);}col+=star*vec3(.85,.88,1.)*.6;gl_FragColor=vec4(col,rays*.92+star*.5);}`;function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);const uT=gl.getUniformLocation(prog,'t'),uR=gl.getUniformLocation(prog,'r'),uM=gl.getUniformLocation(prog,'m');resize();function loop(ts){const s=.93;sm.x=sm.x*s+mouse.x*(1-s);sm.y=sm.y*s+mouse.y*(1-s);gl.uniform1f(uT,ts*.001);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uM,sm.x,sm.y);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(loop);}requestAnimationFrame(loop);})();
+</script>
+<script src="tooltip.js"></script>
+<script>
+(function(){const s=new Audio('click.mp3');s.volume=0.35;document.addEventListener('click',function(e){if(e.target.closest('button,a,.cat-btn,.copy-btn,.btn,.nav-link,.size-btn')){const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});}});})();
+</script>
+<style>.click-ripple{position:fixed;pointer-events:none;z-index:99999;border-radius:50%;transform:scale(0);animation:click-ripple-anim 0.5s ease-out forwards;}@keyframes click-ripple-anim{0%{transform:scale(0);opacity:0.7;}100%{transform:scale(1);opacity:0;}}</style>
+<script>
+(function(){
+  const s=new Audio("click.mp3");s.volume=0.35;
+  document.addEventListener("click",function(e){
+    if(e.target.closest("button,a,.cat-btn,.dock-item,.copy-btn,.btn,.nav-link,.size-btn,.illus-btn,.peep-btn,.color-swatch,.icon-card")){
+      const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});
+    }
+    const r=document.createElement("div");
+    r.className="click-ripple";
+    const size=60;
+    r.style.cssText="width:"+size+"px;height:"+size+"px;left:"+(e.clientX-size/2)+"px;top:"+(e.clientY-size/2)+"px;background:radial-gradient(circle,rgba(129,140,248,0.55) 0%,rgba(192,132,252,0.2) 50%,transparent 70%);";
+    document.body.appendChild(r);
+    setTimeout(()=>r.remove(),500);
+  });
+})();
+</script>
+</body>
+</html>

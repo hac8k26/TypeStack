@@ -12,8 +12,8 @@ Preview 1000+ Google Fonts, copy CSS snippets, download font files, and browse L
 
 | Page | Description |
 |------|-------------|
-| `landing.html` | Hero landing page with circuit board background animation |
-| `index.html` | Font library — live preview, copy CSS, download |
+| `index.html` | Hero landing page with circuit board background animation |
+| `fonts.html` | Font library — live preview, copy CSS, download |
 | `icons.html` | Icon library — browse & copy Lucide SVG icons |
 | `terms.html` | Terms of Service |
 | `privacy.html` | Privacy Policy |
@@ -68,8 +68,8 @@ const API_KEY = 'sk-or-v1-your-key-here';
 
 ```
 .
-├── landing.html      # Landing page
-├── index.html        # Font library
+├── index.html        # Landing page (served first by GitHub Pages)
+├── fonts.html        # Font library
 ├── icons.html        # Icon library
 ├── terms.html        # Terms of Service
 ├── privacy.html      # Privacy Policy

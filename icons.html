@@ -23,7 +23,7 @@
         body { background: #07080f; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
 
         #bg-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-        nav, .stats-bar, .grid, #toast { position: relative; z-index: 1; }
+        nav, .grid, #toast { position: relative; z-index: 1; }
 
         /* Frosted Sticky Header */
         nav {
@@ -34,7 +34,7 @@
             padding: 16px 5%; display: flex; justify-content: space-between; align-items: center;
         }
         .brand { font-weight: 600; font-size: 15px; letter-spacing: -0.5px; text-decoration: none; color: #fff; }
-        .controls { display: flex; gap: 10px; align-items: center; }
+        .controls { display: none; }
         .nav-link {
             padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
             font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6);
@@ -63,24 +63,31 @@
         .btn-primary { background: #fff; color: #0f172a; border-color: #fff; }
         .btn-primary:hover { background: #e2e8f0; border-color: #e2e8f0; }
 
-        /* Stats bar */
-        .stats-bar {
-            padding: 12px 5%; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-            border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03);
-            font-size: 12px; color: rgba(255,255,255,0.4);
+        /* Floating search bar */
+        .float-bar {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            z-index: 100; display: flex; align-items: center; gap: 10px;
+            background: rgba(7,8,15,0.9);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
+            padding: 10px 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
-        .stats-bar strong { color: #fff; font-weight: 600; }
-        .stats-bar .sep { display: none; }
-        @media (min-width: 480px) { .stats-bar .sep { display: inline; } }
+        .float-bar svg { color: rgba(255,255,255,0.3); flex-shrink: 0; }
+        .float-bar input { flex: 1; min-width: 140px; background: transparent; border: none; outline: none; font-size: 13px; color: #fff; font-family: 'Inter', sans-serif; }
+        .float-bar input::placeholder { color: rgba(255,255,255,0.3); }
+        .bar-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+        .pill-count { font-size: 11px; color: rgba(255,255,255,0.3); white-space: nowrap; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+        .pill-count strong { color: rgba(255,255,255,0.7); }
 
         /* Size selector */
         .size-btns { display: flex; gap: 4px; }
         .size-btn {
-            padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
-            background: transparent; cursor: pointer; font-size: 11px; font-weight: 500;
+            padding: 3px 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12);
+            background: transparent; cursor: pointer; font-size: 10px; font-weight: 500;
             color: rgba(255,255,255,0.4); transition: all 0.2s; font-family: 'Inter', sans-serif;
         }
         .size-btn.active { background: #fff; color: #0f172a; border-color: #fff; }
+        @media(max-width: 600px) { .float-bar { max-width: calc(100vw - 32px); } .float-bar input { min-width: 80px; } }
 
         /* Icon Grid */
         .grid {
@@ -146,7 +153,15 @@
             .controls input[type="text"] { width: 130px; }
             .grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; padding: 16px 4%; }
             .icon-card { padding: 14px 8px 10px; }
-            .stats-bar { gap: 8px; }
+        }
+    
+        .nav-github-mobile{display:none;}
+        @media(min-width:641px){
+          .nav-right{display:flex !important;}
+        }
+        @media(max-width:640px){
+          .nav-right{display:none !important;}
+          .nav-github-mobile{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);text-decoration:none;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.2s;}
         }
     </style>
 </head>
@@ -174,45 +189,66 @@
     </div>
     <script>
         document.getElementById('consent-check').addEventListener('change',function(){const b=document.getElementById('consent-btn');if(this.checked){b.disabled=false;b.style.background='#fff';b.style.color='#0f172a';b.style.cursor='pointer';b.style.boxShadow='0 4px 20px rgba(255,255,255,0.1)';}else{b.disabled=true;b.style.background='rgba(255,255,255,0.1)';b.style.color='rgba(255,255,255,0.25)';b.style.cursor='not-allowed';b.style.boxShadow='none';}});
-        function acceptConsent(){localStorage.setItem('ts_consent','1');const o=document.getElementById('consent-overlay');o.style.opacity='0';o.style.transition='opacity 0.4s ease';setTimeout(()=>o.remove(),400);}
+        function acceptConsent(){localStorage.setItem('ts_consent','1');const o=document.getElementById('consent-overlay');o.style.opacity='0';o.style.transition='opacity 0.4s ease';setTimeout(()=>{o.remove();},400);}
         if(localStorage.getItem('ts_consent')==='1')document.getElementById('consent-overlay').remove();
     </script>
 
     <nav>
-        <a href="landing.html" class="brand">TypeStack</a>
-        <div class="controls">
-            <input type="text" id="searchInput" placeholder="Search icons..." oninput="filterIcons(this.value)">
-            <a href="index.html" class="btn">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
-                Fonts
-            </a>
-        </div>
+        <a href="index.html" class="brand">
+            <svg height="20" viewBox="0 0 172 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="3.5" cy="14" r="3" fill="#818cf8"/>
+                <rect x="11" y="3" width="12" height="2.5" rx="1.25" fill="white"/>
+                <rect x="15.75" y="3" width="2.5" height="13" rx="1.25" fill="white"/>
+                <rect x="27" y="7" width="2.2" height="8" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="32" y="7" width="2.2" height="11" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="27" y="14.5" width="7.2" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="7" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="7" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="43" y="7" width="2.2" height="7" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="12" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="11" width="5.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="61" y="7" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="61" y="7" width="2.2" height="5" rx="1.1" fill="white"/>
+                <rect x="61" y="11" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="65.3" y="11" width="2.2" height="5" rx="1.1" fill="white"/>
+                <rect x="61" y="14" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="72" y="4" width="2.2" height="12" rx="1.1" fill="white"/>
+                <rect x="69.5" y="7" width="7" height="2" rx="1" fill="white"/>
+                <rect x="81" y="9" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="85.3" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="81" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="81" y="11" width="2.2" height="5" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="103" y="3" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="103" y="10" width="5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <line x1="106" y1="10" x2="110" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+                <line x1="106" y1="12" x2="110" y2="16" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+        </a>
+        <div class="controls"></div>
+        <a href="https://github.com/hac8k26/TypeStack" target="_blank" rel="noopener" class="nav-github-mobile" aria-label="Star on GitHub">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            Star
+        </a>
     </nav>
 
-    <!-- Page title image -->
-    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;padding:32px 5% 0;">
-        <svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="52" height="52" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-            <circle cx="14" cy="26" r="3.5" fill="white" opacity="0.9"/>
-            <rect x="22" y="14" width="16" height="3.5" rx="1.75" fill="white"/>
-            <rect x="28.25" y="14" width="3.5" height="24" rx="1.75" fill="white"/>
-        </svg>
-        <div>
-            <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.8px;line-height:1;">TypeStack</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;">Icon Library</div>
-        </div>
-    </div>
 
-    <div class="stats-bar">
-        <span><strong id="visibleCount">0</strong> icons</span>
-        <span class="sep">·</span>
-        <span>Lucide Icons</span>
-        <span class="sep">·</span>
+    <div class="float-bar" id="iconFloatBar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search icons…" oninput="filterIcons(this.value)">
+        <div class="bar-sep"></div>
         <div class="size-btns">
             <button class="size-btn" onclick="setSize(16)" data-size="16">16</button>
             <button class="size-btn active" onclick="setSize(24)" data-size="24">24</button>
             <button class="size-btn" onclick="setSize(32)" data-size="32">32</button>
         </div>
+        <div class="bar-sep"></div>
+        <span class="pill-count"><strong id="visibleCount">0</strong> icons</span>
     </div>
 
     <div class="grid" id="grid"></div>
@@ -317,21 +353,56 @@
         (function(){const canvas=document.getElementById('bg-canvas');const gl=canvas.getContext('webgl')||canvas.getContext('experimental-webgl');if(!gl)return;let mouse={x:.5,y:.5},sm={x:.5,y:.5};function resize(){const d=Math.min(devicePixelRatio,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height);}window.addEventListener('resize',resize);window.addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight;});const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;const fs=`precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float ray(vec2 src,vec2 dir,vec2 c,float a,float b,float s){vec2 d=c-src;vec2 dn=normalize(d);float ca=dot(dn,dir);float sp=pow(max(ca,0.),6.);float dist=length(d);float f=clamp((r.x*2.-dist)/(r.x*2.),0.,1.);float pulse=.7+.3*sin(t*s+ca*a);float base=clamp(.45+.15*sin(ca*a+t*s)+.3+.2*cos(-ca*b+t*s),0.,1.);return base*f*sp*pulse;}void main(){vec2 c=vec2(gl_FragCoord.x,r.y-gl_FragCoord.y);vec2 src=vec2(r.x*(.5+(m.x-.5)*.12),-r.y*.04);vec2 dir=normalize(vec2((m.x-.5)*.18,1.));float rays=ray(src,dir,c,36.22,21.11,1.5)*.55+ray(src,dir,c,22.4,18.02,1.1)*.4;vec3 col=rays*vec3(.55,.52,1.);col*=.15+(1.-c.y/r.y)*.85;float star=0.;for(int i=0;i<3;i++){vec2 cell=floor(c/(80.+float(i)*40.));vec2 h2=vec2(h(cell+float(i)*7.3),h(cell+float(i)*13.7));vec2 sp=(cell+h2)*(80.+float(i)*40.);float d=length(c-sp);float tw=.5+.5*sin(t*(1.5+h2.x*3.)+h2.y*6.28);star+=tw*smoothstep(1.8,0.,d)*(.3+h2.x*.7);}col+=star*vec3(.85,.88,1.)*.6;gl_FragColor=vec4(col,rays*.92+star*.5);}`;function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);const uT=gl.getUniformLocation(prog,'t'),uR=gl.getUniformLocation(prog,'r'),uM=gl.getUniformLocation(prog,'m');resize();function loop(ts){const s=.93;sm.x=sm.x*s+mouse.x*(1-s);sm.y=sm.y*s+mouse.y*(1-s);gl.uniform1f(uT,ts*.001);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uM,sm.x,sm.y);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(loop);}requestAnimationFrame(loop);})();
     </script>
 
-    <audio id="bg-music" src="Blissful.mp3" loop preload="auto"></audio>
-    <button id="music-btn" title="Toggle music" aria-label="Toggle music">
-        <svg id="music-icon-on" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        <svg id="music-icon-off" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-        <span class="music-label">Blissful</span>
-    </button>
-    <style>
-        #music-btn { position:fixed;bottom:24px;right:24px;left:auto;z-index:999;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;background:rgba(7,8,15,0.7);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);cursor:pointer;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;letter-spacing:0.2px;transition:all 0.2s;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);white-space:nowrap; }
-        #music-btn:hover { background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.22);color:#fff; }
-        #music-btn.muted { color:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.07); }
-        #music-btn .music-label { font-size:11px; }
-    </style>
+    <script src="tooltip.js"></script>
     <script>
-        (function(){const music=document.getElementById('bg-music'),btn=document.getElementById('music-btn'),on=document.getElementById('music-icon-on'),off=document.getElementById('music-icon-off');let playing=false;music.volume=0.35;function play(){music.play().then(()=>{playing=true;btn.classList.remove('muted');on.style.display='';off.style.display='none';}).catch(()=>{});}function first(){play();document.removeEventListener('click',first);document.removeEventListener('keydown',first);document.removeEventListener('touchstart',first);}document.addEventListener('click',first);document.addEventListener('keydown',first);document.addEventListener('touchstart',first);btn.addEventListener('click',e=>{e.stopPropagation();if(playing){music.pause();playing=false;btn.classList.add('muted');on.style.display='none';off.style.display='';}else{play();}});})();
+    (function(){
+      const canvas=document.createElement('canvas');
+      canvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+      document.body.appendChild(canvas);
+      const ctx=canvas.getContext('2d');
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+      window.addEventListener('resize',resize);resize();
+      let sparks=[];
+      function ease(t){return t*(2-t);}
+      function loop(ts){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        sparks=sparks.filter(s=>{
+          const p=(ts-s.t)/500;if(p>=1)return false;
+          const e=ease(p),dist=e*40,len=12*(1-e);
+          const x1=s.x+dist*Math.cos(s.a),y1=s.y+dist*Math.sin(s.a);
+          const x2=s.x+(dist+len)*Math.cos(s.a),y2=s.y+(dist+len)*Math.sin(s.a);
+          ctx.globalAlpha=1-e;ctx.strokeStyle='#fff';ctx.lineWidth=2;
+          ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+          return true;
+        });
+        ctx.globalAlpha=1;requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+      document.addEventListener('click',e=>{
+        const now=performance.now();
+        for(let i=0;i<8;i++) sparks.push({x:e.clientX,y:e.clientY,a:(2*Math.PI*i)/8,t:now});
+      });
+    })();
     </script>
-    <script src="chatbot.js"></script>
+<script>
+(function(){const s=new Audio('click.mp3');s.volume=0.35;document.addEventListener('click',function(e){if(e.target.closest('button,a,.cat-btn,.copy-btn,.btn,.nav-link,.size-btn')){const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});}});})();
+</script>
+<style>.click-ripple{position:fixed;pointer-events:none;z-index:99999;border-radius:50%;transform:scale(0);animation:click-ripple-anim 0.5s ease-out forwards;}@keyframes click-ripple-anim{0%{transform:scale(0);opacity:0.7;}100%{transform:scale(1);opacity:0;}}</style>
+<script>
+(function(){
+  const s=new Audio("click.mp3");s.volume=0.35;
+  document.addEventListener("click",function(e){
+    if(e.target.closest("button,a,.cat-btn,.dock-item,.copy-btn,.btn,.nav-link,.size-btn,.illus-btn,.peep-btn,.color-swatch,.icon-card")){
+      const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});
+    }
+    const r=document.createElement("div");
+    r.className="click-ripple";
+    const size=60;
+    r.style.cssText="width:"+size+"px;height:"+size+"px;left:"+(e.clientX-size/2)+"px;top:"+(e.clientY-size/2)+"px;background:radial-gradient(circle,rgba(129,140,248,0.55) 0%,rgba(192,132,252,0.2) 50%,transparent 70%);";
+    document.body.appendChild(r);
+    setTimeout(()=>r.remove(),500);
+  });
+})();
+</script>
 </body>
 </html>

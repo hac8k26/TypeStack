@@ -3,580 +3,960 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Font Library</title>
+    <title>TypeStack — Modern Font Library</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@400;600&family=Playfair+Display:wght@400;600&family=Sora:wght@400;600&family=Dancing+Script:wght@400;600&family=Orbitron:wght@400;600&family=Lobster&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Tailwind-inspired Slate color palette */
-            --bg: #f8fafc; 
+            --bg: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a; 
-            --text-muted: #64748b; 
-            --border: #e2e8f0; 
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
             --border-hover: #cbd5e1;
             --radius: 16px;
-            --ring: #3b82f6; /* Blue accent for focus */
+            --ring: #3b82f6;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            background: #07080f; 
-            color: #e2e8f0; 
-            font-family: 'Inter', sans-serif; 
+        body {
+            background: #07080f;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        #bg-canvas {
-            position: fixed; inset: 0; width: 100%; height: 100%;
+        /* Full-page WebGL canvas — fixed behind everything */
+        #spotlight-canvas {
+            position: fixed;
+            inset: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0;
         }
 
-        nav, .grid, #toast {
+        /* All page content sits above the canvas */
+        nav, .hero-wrap, .marquee-wrap, .section-wrap,
+        .preview-section, .cta-section, footer, .stats-grid-wrap {
             position: relative; z-index: 1;
         }
 
-        /* --- Frosted Sticky Header --- */
-        nav {
-            position: sticky; 
-            top: 0; 
-            z-index: 50;
+        /* HERO WRAPPER */
+        .hero-wrap { background: transparent; }
+
+        .hero-nav {
+            position: sticky; top: 0; left: 0; right: 0; z-index: 50;
+            padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
             background: rgba(7,8,15,0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(255,255,255,0.07);
-            padding: 16px 5%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
         }
-
-        .brand { font-weight: 600; font-size: 15px; letter-spacing: -0.5px; text-decoration: none; color: #fff; }
-
-        .controls { display: flex; gap: 16px; align-items: center; }
-
-        input[type="text"] {
-            padding: 10px 16px; 
-            border-radius: 8px; 
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06); 
-            outline: none; 
-            font-size: 14px;
-            width: 250px;
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-
-        input[type="text"]::placeholder { color: rgba(255,255,255,0.3); }
-
-        input[type="text"]:focus { 
-            border-color: rgba(99,102,241,0.6); 
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15); 
-        }
-
-        /* --- Card Grid Layout --- */
-        .grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px; 
-            padding: 40px 5%; 
-            max-width: 1600px; 
-            margin: 0 auto;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.04); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            border-radius: var(--radius);
-            padding: 24px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2); 
-            transition: all 0.2s ease;
-        }
-
-        .card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.3); 
-            border-color: rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.07);
-        }
-
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        .badge {
-            background: rgba(255,255,255,0.07); 
-            color: rgba(255,255,255,0.5); 
-            padding: 4px 10px; 
-            border-radius: 6px;
-            font-size: 11px; 
-            font-weight: 600; 
-            letter-spacing: 0.5px;
-        }
-
-        .specimen { 
-            font-size: 32px; 
-            outline: none; 
-            line-height: 1.3; 
-            flex-grow: 1; 
-            word-break: break-word;
-            color: #fff;
-        }
-
-        /* --- Buttons --- */
-        .actions { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: auto; 
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-        }
-
+        .hero-nav .brand { color: #fff; text-decoration: none; font-weight: 800; font-size: 17px; letter-spacing: -0.8px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .brand { font-weight: 800; font-size: 17px; letter-spacing: -0.8px; text-decoration: none; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
         .btn {
-            padding: 8px 14px; 
-            border-radius: 6px; 
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06); 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 500;
-            color: rgba(255,255,255,0.75); 
-            transition: all 0.2s;
-            text-decoration: none;
+            padding: 8px 14px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06); cursor: pointer; font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,0.75); transition: all 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;
+        }
+        .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+        .btn-primary { background: #fff; color: #0f172a; border-color: #fff; }
+        .btn-primary:hover { background: #e2e8f0; border-color: #e2e8f0; color: #0f172a; }
+        .btn-lg { padding: 12px 22px; font-size: 13px; border-radius: 8px; }
+
+        /* HERO */
+        .hero {
+            max-width: 820px; margin: 0 auto;
+            padding: 80px 5% 100px; text-align: center;
+            position: relative; z-index: 1;
+        }
+        .hero-badge {
             display: inline-flex; align-items: center; gap: 6px;
-            font-family: 'Inter', sans-serif;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 100px; padding: 5px 14px 5px 10px;
+            font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5);
+            letter-spacing: 0.3px; margin-bottom: 28px;
         }
-
-        .btn:hover { 
-            background: rgba(255,255,255,0.12); 
-            border-color: rgba(255,255,255,0.25);
-            color: #fff;
+        .hero-badge svg { color: #a5b4fc; }
+        h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(38px, 6.5vw, 68px); font-weight: 800;
+            line-height: 1.08; letter-spacing: -2.5px; margin-bottom: 22px;
+            color: #ffffff;
         }
-
-        .btn-primary { 
-            background: #fff; 
-            color: #0f172a; 
-            border-color: #fff; 
+        h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
-        .btn-primary:hover { 
-            background: #e2e8f0; 
-            border-color: #e2e8f0; 
+        .hero-sub { font-size: 17px; color: rgba(255,255,255,0.45); line-height: 1.7; max-width: 480px; margin: 0 auto 36px; }
+        .hero-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .hero-actions .btn-primary {
+            background: #fff; color: #0f172a; border-color: #fff;
         }
+        .hero-actions .btn-primary:hover { background: #e2e8f0; border-color: #e2e8f0; }
+        .hero-actions .btn-lg {
+            border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+            background: rgba(255,255,255,0.06);
+        }
+        .hero-actions .btn-lg:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .social-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 14px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.45); text-decoration: none;
+            font-size: 12px; font-weight: 500; transition: all 0.2s;
+            background: rgba(255,255,255,0.05); font-family: 'Inter', sans-serif;
+        }
+        .social-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.09); }
 
-        /* --- Toast Notification --- */
-        #toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: rgba(15,23,42,0.95);
+        /* MARQUEE */
+        .marquee-wrap {
+            overflow: hidden;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 18px 0;
+            background: rgba(255,255,255,0.03);
+        }
+        .marquee-track { display: flex; gap: 40px; width: max-content; animation: scroll 32s linear infinite; }
+        .marquee-item { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.3); white-space: nowrap; letter-spacing: 0.2px; }
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* SECTION COMMON */
+        .section-wrap { max-width: 1100px; margin: 0 auto; padding: 80px 5%; }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: 1px;
+            color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 12px;
+        }
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(26px, 3.5vw, 38px); font-weight: 700;
+            letter-spacing: -1px; margin-bottom: 48px; color: #fff;
+        }
+        .section-center { text-align: center; }
+        .section-center .section-label { justify-content: center; }
+
+        /* FEATURE GRID */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .feature-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius); padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: all 0.2s ease;
+        }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); }
+        .feature-icon {
+            width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+            color: #a5b4fc;
+        }
+        .feature-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #fff; }
+        .feature-card p { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+
+        /* PREVIEW CARDS */
+        .preview-section {
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .preview-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius); padding: 24px;
+            display: flex; flex-direction: column; gap: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: all 0.2s ease;
+        }
+        .preview-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15); }
+        .badge {
+            background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5);
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+            display: inline-block; align-self: flex-start;
+        }
+        .sample { font-size: 26px; line-height: 1.3; color: #fff; }
+        .preview-card-footer { padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07); }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius); padding: 32px 24px; text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .stat-icon { display: flex; justify-content: center; margin-bottom: 16px; color: rgba(255,255,255,0.3); }
+        .stat-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 44px; font-weight: 800; letter-spacing: -2px; color: #fff; }
+        .stat-label { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+        /* CTA */
+        .cta-section {
+            background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            z-index: 100;
+            color: #fff;
+            margin: 0 5% 80px; border-radius: var(--radius);
+            padding: 64px 5%; text-align: center;
         }
+        .cta-section h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(26px, 4vw, 42px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 14px; color: #fff; }
+        .cta-section p { font-size: 15px; color: rgba(255,255,255,0.45); margin-bottom: 32px; line-height: 1.6; }
+        .btn-cta { background: #fff; color: #0f172a; border: none; padding: 13px 26px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .btn-cta:hover { background: #e2e8f0; }
 
-        .toast-visible {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
+        /* FOOTER */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.07);
+            padding: 28px 5%; display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; color: rgba(255,255,255,0.35); gap: 16px; flex-wrap: wrap;
         }
+        footer a { color: rgba(255,255,255,0.35); }
+        footer a:hover { color: rgba(255,255,255,0.7); }
+        .footer-social { display: flex; gap: 8px; align-items: center; }
 
-        /* Nav links */
-        .nav-link {
-            padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
-            font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6);
-            text-decoration: none; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(255,255,255,0.05);
-        }
-        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
+        /* HAMBURGER */
+        .menu-toggle { display: none; }
+        .nav-desktop-link { display: inline-flex; }
 
-        @media (max-width: 640px) {
-            .nav-right input[type="text"] { width: 140px; }
-            .grid { grid-template-columns: 1fr; gap: 14px; padding: 20px 4%; }
-            .specimen { font-size: 26px; }
+        @media (max-width: 700px) {
+            .nav-desktop-link { display: none; }
+            .preview-grid, .stats-grid { grid-template-columns: 1fr; }
+            footer { flex-direction: column; gap: 12px; text-align: center; }
+            .cta-section { margin: 0 0 60px; border-radius: 0; }
+
+            .hero { padding: 56px 5% 48px; }
+            .hero-sub { font-size: 15px; }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .hero-actions .btn { justify-content: center; }
+
+            .section-wrap { padding: 56px 5%; }
+            .section-title { margin-bottom: 32px; }
+            .feature-grid { grid-template-columns: 1fr; }
+
+            .stat-num { font-size: 34px; }
+            .stat-card { padding: 24px 16px; }
+
+            .cta-section { padding: 48px 5%; }
         }
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
 
-    <!-- Consent gate -->
-    <div id="consent-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(7,8,15,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;">
-        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:40px 36px;max-width:460px;width:100%;box-shadow:0 32px 64px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.05);font-family:'Inter',sans-serif;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <span style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.4px;font-family:'Plus Jakarta Sans',sans-serif;">Before you continue</span>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.07);margin:20px 0;"></div>
-            <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.8;margin-bottom:24px;">By using <span style="color:rgba(255,255,255,0.75);font-weight:500;">TypeStack</span> you agree to our <a href="terms.html" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Privacy Policy</a>. We don't collect personal data, use cookies, or require sign-up.</p>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:24px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
-                <input type="checkbox" id="consent-check" style="margin-top:1px;width:15px;height:15px;flex-shrink:0;accent-color:#fff;cursor:pointer;">
-                <span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.65;">I have read and agree to the Terms of Service and Privacy Policy</span>
-            </label>
-            <button id="consent-btn" disabled onclick="acceptConsent()" style="width:100%;padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.25);font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:not-allowed;transition:all 0.25s;letter-spacing:0.1px;">Accept &amp; Continue</button>
-            <p style="text-align:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,0.2);">You can review our policies at any time in the footer</p>
+    <!-- Consent popup -->
+    <div id="consent-overlay" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;width:calc(100% - 48px);max-width:520px;background:rgba(10,10,18,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 16px 48px rgba(0,0,0,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);font-family:'Inter',sans-serif;transition:all 0.4s ease;">
+        <div style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <p style="flex:1;font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;margin:0;">By using <span style="color:rgba(255,255,255,0.8);font-weight:600;">TypeStack</span> you agree to our <a href="terms.html" target="_blank" style="color:rgba(255,255,255,0.6);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:rgba(255,255,255,0.6);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.2);">Privacy Policy</a>.</p>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button onclick="ignoreConsent()" style="padding:8px 14px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.35);font-size:12px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Ignore</button>
+            <button onclick="acceptConsent()" style="padding:8px 16px;border-radius:7px;border:none;background:#fff;color:#0f172a;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">Accept</button>
         </div>
     </div>
+
     <script>
-        document.getElementById('consent-check').addEventListener('change',function(){const b=document.getElementById('consent-btn');if(this.checked){b.disabled=false;b.style.background='#fff';b.style.color='#0f172a';b.style.cursor='pointer';b.style.boxShadow='0 4px 20px rgba(255,255,255,0.1)';}else{b.disabled=true;b.style.background='rgba(255,255,255,0.1)';b.style.color='rgba(255,255,255,0.25)';b.style.cursor='not-allowed';b.style.boxShadow='none';}});
-        function acceptConsent(){localStorage.setItem('ts_consent','1');const o=document.getElementById('consent-overlay');o.style.opacity='0';o.style.transition='opacity 0.4s ease';setTimeout(()=>o.remove(),400);}
-        if(localStorage.getItem('ts_consent')==='1')document.getElementById('consent-overlay').remove();
+        function acceptConsent() {
+            localStorage.setItem('ts_consent', '1');
+            const overlay = document.getElementById('consent-overlay');
+            overlay.style.opacity = '0'; overlay.style.transform = 'translateX(-50%) translateY(20px)';
+            setTimeout(() => { overlay.remove(); showMusicPrompt(); }, 400);
+        }
+        function ignoreConsent() {
+            const overlay = document.getElementById('consent-overlay');
+            overlay.style.opacity = '0'; overlay.style.transform = 'translateX(-50%) translateY(20px)';
+            setTimeout(() => overlay.remove(), 400);
+        }
+
+        function showMusicPrompt() {
+            const el = document.createElement('div');
+            el.id = 'music-prompt';
+            el.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(7,8,15,0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);';
+            el.innerHTML = `
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px 28px;max-width:360px;width:100%;text-align:center;font-family:'Inter',sans-serif;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+                    <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <div style="font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.4px;margin-bottom:8px;">Play background music?</div>
+                    <p style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:24px;">Blissful — ambient music to set the mood while you browse.</p>
+                    <div style="display:flex;gap:10px;">
+                        <button onclick="document.dispatchEvent(new Event('ts-music-allow'));document.getElementById('music-prompt').remove();" style="flex:1;padding:11px;border-radius:8px;border:none;background:#fff;color:#0f172a;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">Allow</button>
+                        <button onclick="document.getElementById('music-prompt').remove();" style="flex:1;padding:11px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">Skip</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(el);
+        }
+
+        if (localStorage.getItem('ts_consent') === '1') document.getElementById('consent-overlay').remove();
     </script>
 
-    <nav>
-        <a href="landing.html" class="brand">TypeStack</a>
-        <div class="nav-right">
-            <a href="icons.html" class="nav-link">
+    <!-- Full-page WebGL light rays canvas -->
+    <canvas id="spotlight-canvas"></canvas>
+
+    <!-- NAV -->
+    <nav class="hero-nav">
+        <a href="index.html" class="brand">
+            <svg height="20" viewBox="0 0 172 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="3.5" cy="14" r="3" fill="#818cf8"/>
+                <rect x="11" y="3" width="12" height="2.5" rx="1.25" fill="white"/>
+                <rect x="15.75" y="3" width="2.5" height="13" rx="1.25" fill="white"/>
+                <rect x="27" y="7" width="2.2" height="8" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="32" y="7" width="2.2" height="11" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="27" y="14.5" width="7.2" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="7" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="7" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="43" y="7" width="2.2" height="7" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="39" y="12" width="6" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="11" width="5.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="50" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="61" y="7" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="61" y="7" width="2.2" height="5" rx="1.1" fill="white"/>
+                <rect x="61" y="11" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="65.3" y="11" width="2.2" height="5" rx="1.1" fill="white"/>
+                <rect x="61" y="14" width="6.5" height="2" rx="1" fill="white"/>
+                <rect x="72" y="4" width="2.2" height="12" rx="1.1" fill="white"/>
+                <rect x="69.5" y="7" width="7" height="2" rx="1" fill="white"/>
+                <rect x="81" y="9" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="85.3" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="81" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="81" y="11" width="2.2" height="5" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="7" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="7" width="2.2" height="9" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="92" y="14" width="6.5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="103" y="3" width="2.2" height="13" rx="1.1" fill="rgba(255,255,255,0.85)"/>
+                <rect x="103" y="10" width="5" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
+                <line x1="106" y1="10" x2="110" y2="7" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+                <line x1="106" y1="12" x2="110" y2="16" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+        </a>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <a href="fonts.html" class="btn nav-desktop-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                Fonts
+            </a>
+            <a href="icons.html" class="btn nav-desktop-link">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m.7 11.4-.7-.7M6.3 18.4l-.7.7"/></svg>
                 Icons
             </a>
-            <input type="text" id="masterInput" placeholder="Type to preview..." oninput="updateText(this.value)">
+            <a href="colors.html" class="btn nav-desktop-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22a7 7 0 0 0 7-7c0-2.38-1.19-4.47-3-5.74V9a5 5 0 0 0-10 0v.26C4.19 10.53 3 12.62 3 15a7 7 0 0 0 7 7h2z"/></svg>
+                Colors
+            </a>
+            <a href="motion.html" class="btn nav-desktop-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Motion
+            </a>
+            <a href="https://github.com/hac8k26/TypeStack" target="_blank" rel="noopener" class="btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                Star on GitHub
+            </a>
         </div>
     </nav>
 
-    <!-- Page title image -->
-    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:14px;padding:40px 5% 0;max-width:1600px;margin:0 auto;">
-        <svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="52" height="52" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-            <circle cx="14" cy="26" r="3.5" fill="white" opacity="0.9"/>
-            <rect x="22" y="14" width="16" height="3.5" rx="1.75" fill="white"/>
-            <rect x="28.25" y="14" width="3.5" height="24" rx="1.75" fill="white"/>
-        </svg>
-        <div>
-            <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.8px;line-height:1;">TypeStack</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;">Font Library</div>
+    <!-- HERO -->
+    <div class="hero-wrap">
+        <section class="hero">
+        <div class="hero-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span style="color:#a5b4fc">1000+ fonts</span> · free to use
+        </div>
+        <h1>The font library<br>built for <em>developers</em></h1>
+        <p class="hero-sub">Preview, copy CSS, and download any font instantly. No sign-up, no friction — just great typography.</p>
+        <div class="hero-actions">
+            <button onclick="toggleLibraryDock()" class="btn btn-primary btn-lg">
+                Browse the Library
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <a href="#features" class="btn btn-lg">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                See Features
+            </a>
+        </div>
+        <a href="https://github.com/hac8k26/TypeStack" target="_blank" rel="noopener" class="social-btn" style="margin-top:20px;" aria-label="Star on GitHub">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            Star on GitHub
+        </a>
+        <div style="margin-top:18px;display:flex;align-items:center;gap:6px;justify-content:center;">
+            <a href="terms.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.25);text-decoration:none;font-family:'Inter',sans-serif;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Terms</a>
+            <span style="color:rgba(255,255,255,0.15);font-size:11px;">·</span>
+            <a href="privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.25);text-decoration:none;font-family:'Inter',sans-serif;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Privacy</a>
+        </div>
+    </section>
+    </div>
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+        <div class="marquee-track" id="marquee"></div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="section-wrap section-center" id="features">
+        <p class="section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Why TypeStack
+        </p>
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <h3>Live Preview</h3>
+                <p>Type anything and see it rendered instantly across all 62 fonts at the same time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </div>
+                <h3>One-click CSS</h3>
+                <p>Copy the exact <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.1);color:#a5b4fc;padding:1px 5px;border-radius:4px">@import</code> and <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.1);color:#a5b4fc;padding:1px 5px;border-radius:4px">font-family</code> snippet ready to paste.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
+                <h3>Direct Download</h3>
+                <p>Download the actual font files to your machine — no redirects, no extra steps.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+                <h3>Editable Cards</h3>
+                <p>Click any specimen text and edit it inline to test your own copy in any font.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <h3>Zero Friction</h3>
+                <p>No accounts, no paywalls. Open the page and start exploring immediately.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+                </div>
+                <h3>1000+ Curated Fonts</h3>
+                <p>Hand-picked modern fonts — sans-serifs, serifs, monospaces, scripts, retro, and more.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <section class="preview-section">
+        <div class="section-wrap section-center">
+            <p class="section-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                Font Preview
+            </p>
+            <h2 class="section-title">A taste of what's inside</h2>
+            <div class="preview-grid">
+                <div class="preview-card">
+                    <span class="badge">Plus Jakarta Sans</span>
+                    <div class="sample" style="font-family:'Plus Jakarta Sans',sans-serif">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Sans-Serif</span>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <span class="badge">Playfair Display</span>
+                    <div class="sample" style="font-family:'Playfair Display',serif">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Serif</span>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <span class="badge">JetBrains Mono</span>
+                    <div class="sample" style="font-family:'JetBrains Mono',monospace;font-size:20px">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Monospace</span>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <span class="badge">Space Grotesk</span>
+                    <div class="sample" style="font-family:'Space Grotesk',sans-serif">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Geometric</span>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <span class="badge">Sora</span>
+                    <div class="sample" style="font-family:'Sora',sans-serif">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Sans-Serif</span>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <span class="badge">Dancing Script</span>
+                    <div class="sample" style="font-family:'Dancing Script',cursive;font-size:30px">The quick brown fox jumps over the lazy dog.</div>
+                    <div class="preview-card-footer">
+                        <span style="font-size:11px;color:rgba(255,255,255,0.35)">Script</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="section-wrap">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                </div>
+                <div class="stat-num">1000+</div>
+                <div class="stat-label">Curated Fonts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="stat-num">3</div>
+                <div class="stat-label">Actions per Font</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="stat-num">0</div>
+                <div class="stat-label">Sign-ups Required</div>
+            </div>
         </div>
     </div>
 
-    <div class="grid" id="grid"></div>
+    <!-- CTA -->
+    <div class="cta-section">
+        <h2>Ready to find your font?</h2>
+        <p>Jump into the library and start previewing, copying, and downloading in seconds.</p>
+        <a href="fonts.html" class="btn-cta">
+            Open TypeStack
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </div>
 
-    <div id="toast">Copied to clipboard!</div>
+    <footer style="justify-content:center;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.35);">Fonts by Google Fonts · Free to use</span>
+    </footer>
+
+
 
     <script>
         const fonts = [
-            // Modern Sans-Serif
-            'Inter','Plus Jakarta Sans','Space Grotesk','Outfit','Sora','Lexend','Manrope','Work Sans','DM Sans','Karla',
-            'Rubik','Cabin','Nunito','Quicksand','Josefin Sans','Raleway','Poppins','Montserrat','Open Sans','Source Sans 3',
-            'Barlow','Mulish','Figtree','Albert Sans','Hanken Grotesk','Onest','Geist','Bricolage Grotesque','Instrument Sans',
-            'Familjen Grotesk','Schibsted Grotesk','Epilogue','Urbanist','Jost','Noto Sans','Roboto','Lato','Nunito Sans',
-            'PT Sans','Hind','Fira Sans','Oxygen','Dosis','Chivo','Asap','Overpass','Encode Sans','Heebo','Assistant',
-            'Catamaran','Signika','Muli','Arimo','Tinos','Cousine','Karla','Cabin Condensed','Cabin Sketch',
-            'Barlow Semi Condensed','Barlow Condensed','Encode Sans Condensed','Encode Sans Semi Condensed',
-            'Fira Sans Condensed','Fira Sans Extra Condensed','Roboto Condensed','Source Sans Pro',
-            'IBM Plex Sans','IBM Plex Sans Condensed','Noto Sans Display','Noto Sans Mono',
-            'Noto Serif Display','Public Sans','Red Hat Display','Red Hat Text','Red Hat Mono',
-            'Readex Pro','Syne','Syne Mono','Syne Tactile','Spline Sans','Spline Sans Mono',
-            'Be Vietnam Pro','Bai Jamjuree','Chakra Petch','Coda','Coda Caption',
-            'Darker Grotesque','DM Serif Display','DM Serif Text','Fraunces','Gantari',
-            'Grandstander','Hubballi','Inclusive Sans','Jaldi','Josefin Slab',
-            'Kumbh Sans','Lekton','Libre Franklin','Literata','Livvic',
-            'Martel','Martel Sans','Maven Pro','Monda','Montserrat Alternates',
-            'Montserrat Subrayada','Mukta','Mukta Mahee','Mukta Malar','Mukta Vaani',
-            'Nanum Gothic','Nanum Myeongjo','Noto Sans JP','Noto Sans KR','Noto Sans SC',
-            'Noto Sans TC','Noto Serif JP','Noto Serif KR','Noto Serif SC','Noto Serif TC',
-            'Nunito Sans','Pathway Gothic One','Pathway Extreme','Phudu','Piazzolla',
-            'Playfair Display SC','Plus Jakarta Sans','Podkova','Proza Libre','Quattrocento',
-            'Quattrocento Sans','Questrial','Recursive','Rethink Sans','Roboto Flex',
-            'Roboto Serif','Rokkitt','Rosario','Ruda','Rufina','Ruwudu',
-            'Saira','Saira Condensed','Saira Extra Condensed','Saira Semi Condensed',
-            'Saira Stencil One','Scada','Sen','Shantell Sans','Slab','Slabo 13px','Slabo 27px',
-            'Smooch Sans','Solway','Sora','Space Grotesk','Spartan','Srisakdi',
-            'Stick No Bills','Sulphur Point','Sunflower','Suwannaphum','Swanky and Moo Moo',
-            'Tajawal','Tauri','Telex','Tenali Ramakrishna','Tenor Sans','Text Me One',
-            'Thasadith','The Girl Next Door','Tienne','Tillana','Timmana',
-            'Tiro Bangla','Tiro Devanagari Hindi','Tiro Devanagari Marathi','Tiro Devanagari Sanskrit',
-            'Tiro Gurmukhi','Tiro Kannada','Tiro Tamil','Tiro Telugu',
-            'Titan One','Titillium Web','Tomorrow','Tourney','Trirong',
-            'Trispace','Truculenta','Tsukimi Rounded','Tulpen One','Turret Road',
-            'Ubuntu','Ubuntu Condensed','Unkempt','Unna','Updock',
-            'Urbanist','Varta','Vesper Libre','Viaoda Libre','Vibes',
-            'Vibur','Vidaloka','Viga','Voces','Volkhov','Vollkorn','Vollkorn SC',
-            'Voltaire','Waiting for the Sunrise','Wallpoet','Walter Turncoat',
-            'Warnes','Waterfall','Wellfleet','Wendy One','WindSong',
-            'Wire One','Wix Madefor Display','Wix Madefor Text','Work Sans',
-            'Xanh Mono','Yantramanav','Yatra One','Yellowtail','Yeon Sung',
-            'Yeseva One','Yesteryear','Yomogi','Young Serif','Yrsa',
-            'Yuji Boku','Yuji Mai','Yuji Syuku','Yusei Magic','ZCOOL KuaiLe',
-            'ZCOOL QingKe HuangYou','ZCOOL XiaoWei','Zen Antique','Zen Antique Soft',
-            'Zen Dots','Zen Kaku Gothic Antique','Zen Kaku Gothic New','Zen Kurenaido',
-            'Zen Loop','Zen Maru Gothic','Zen Old Mincho','Zen Tokyo Zoo',
-            'Zeyada','Zhi Mang Xing','Zilla Slab Highlight',
-            // Geometric / Display
-            'Oxanium','Exo 2','Exo','Rajdhani','Titillium Web','Varela Round','Comfortaa',
-            'Kanit','Prompt','Sarabun','Yanone Kaffeesatz','Audiowide','Michroma',
-            'Orbitron','Syncopate','Unica One','Russo One','Teko',
-            'Righteous','Fredoka','Passion One','Fjalla One','Barlow Condensed',
-            'Oswald','Anton','Bebas Neue','Black Han Sans','Black Ops One',
-            'Boogaloo','Bowlby One','Bowlby One SC','Bree Serif','Bubblegum Sans',
-            'Bungee','Bungee Hairline','Bungee Inline','Bungee Outline','Bungee Shade',
-            'Bungee Spice','Butcherman','Cabin Condensed','Caesar Dressing','Cagliostro',
-            'Cambo','Candal','Cantarell','Cantata One','Cantora One',
-            'Capriola','Cardo','Carme','Carrois Gothic','Carrois Gothic SC',
-            'Carter One','Castoro','Castoro Titling','Catamaran','Caudex',
-            'Caveat Brush','Cedarville Cursive','Ceviche One','Chakra Petch','Changa',
-            'Changa One','Chango','Charis SIL','Charm','Charmonman',
-            'Chathura','Chau Philomene One','Chela One','Chelsea Market','Chenla',
-            'Cherry Bomb One','Cherry Cream Soda','Cherry Swash','Chewy','Chicle',
-            'Chilanka','Chivo Mono','Chonburi','Cinzel','Cinzel Decorative',
-            'Clicker Script','Coda','Coda Caption','Codystar','Coiny',
-            'Combo','Comfortaa','Comic Neue','Coming Soon','Commissioner',
-            'Concert One','Condiment','Content','Contrail One','Convergence',
-            'Cookie','Copse','Corben','Corinthia','Cormorant',
-            'Cormorant Garamond','Cormorant Infant','Cormorant SC','Cormorant Unicase',
-            'Cormorant Upright','Courgette','Courier Prime','Cousine','Coustard',
-            'Covered By Your Grace','Crafty Girls','Creepster','Crete Round',
-            'Crimson Pro','Crimson Text','Croissant One','Crushed','Cuprum',
-            'Cute Font','Cutive','Cutive Mono',
-            // Serif
-            'Playfair Display','Lora','Merriweather','PT Serif','Libre Baskerville',
-            'Crimson Text','EB Garamond','Cormorant Garamond','Spectral',
-            'Bitter','Arvo','Zilla Slab','Noto Serif','Alfa Slab One','Abril Fatface','Ultra',
-            'Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC',
-            'Alice','Alike','Alike Angular','Allan','Almendra','Almendra Display','Almendra SC',
-            'Aleo','Amethysta','Amiri','Amiri Quran','Amouage','Andada Pro',
-            'Antic','Antic Didone','Antic Slab','Antonia','Arapey',
-            'Arbutus','Arbutus Slab','Artifika','Arvo','Asul',
-            'Athiti','Atkinson Hyperlegible','Atma','Atomic Age','Aubrey',
-            'Audiowide','Autour One','Average','Average Sans','Averia Gruesa Libre',
-            'Averia Libre','Averia Sans Libre','Averia Serif Libre',
-            'BIZ UDGothic','BIZ UDMincho','BIZ UDPGothic','BIZ UDPMincho',
-            'Babylonica','Bacasime Antique','Bad Script','Bagel Fat One','Bahiana',
-            'Bahianita','Bai Jamjuree','Bakbak One','Ballet','Baloo 2',
-            'Baloo Bhai 2','Baloo Bhaijaan 2','Baloo Bhaina 2','Baloo Chettan 2',
-            'Baloo Da 2','Baloo Paaji 2','Baloo Tamma 2','Baloo Tammudu 2','Baloo Thambi 2',
-            'Balsamiq Sans','Balthazar','Bangers','Barlow','Barlow Condensed',
-            'Barlow Semi Condensed','Barriecito','Barrio','Basic','Baskervville',
-            'Battambang','Baumans','Bayon','Be Vietnam Pro','Beau Rivage',
-            'Bebas Neue','Belanosima','Belgrano','Bellefair','Belleza',
-            'Bellota','Bellota Text','BenchNine','Benne','Bentham',
-            'Berkshire Swash','Besley','Beth Ellen','Bigelow Rules','Bigshot One',
-            'Bilbo','Bilbo Swash Caps','BioRhyme','BioRhyme Expanded','Birthstone',
-            'Birthstone Bounce','Biryani','Bitter','Black And White Picture',
-            'Black Han Sans','Black Ops One','Blaka','Blaka Hollow','Blaka Ink',
-            'Blinker','Bodoni Moda','Bokor','Bona Nova','Bonbon',
-            'Bonheur Royale','Boogaloo','Bowlby One','Bowlby One SC','Brawler',
-            'Bree Serif','Brygada 1918','Bubblegum Sans','Bubbler One','Buda',
-            'Buenard','Bungee','Bungee Hairline','Bungee Inline','Bungee Outline',
-            // Monospace
-            'JetBrains Mono','Inconsolata','IBM Plex Mono','Fira Code',
-            'Source Code Pro','Roboto Mono','Ubuntu Mono','Courier Prime',
-            'Share Tech Mono','Space Mono','Cutive Mono','VT323',
-            'Anonymous Pro','B612 Mono','Cousine','DM Mono','Fira Mono',
-            'Fragment Mono','Geist Mono','Hack','Hasklig','Input Mono',
-            'Iosevka','Lilex','Martian Mono','Monaspace Argon','Monaspace Krypton',
-            'Monaspace Neon','Monaspace Radon','Monaspace Xenon','Noto Sans Mono',
-            'Office Code Pro','Overpass Mono','PT Mono','Red Hat Mono',
-            'Sometype Mono','Syne Mono','Ubuntu Sans Mono','Victor Mono',
-            // Retro / Pixel / Sci-Fi
-            'Press Start 2P','Orbitron','Audiowide','Michroma','Syncopate',
-            'Turret Road','Wallpoet','Share Tech','Nova Mono','Nova Oval',
-            'Nova Round','Nova Script','Nova Slim','Nova Square',
-            'Aldrich','Electrolize','Exo','Exo 2','Gugi','Iceland',
-            'Jura','Kode Mono','Krona One','Megrim','Oxanium',
-            'Quantico','Rajdhani','Rationale','Reem Kufi','Reem Kufi Fun',
-            'Reem Kufi Ink','Russo One','Saira Stencil One','Share Tech Mono',
-            'Silkscreen','Sonsie One','Stalinist One','Stick','Teko',
-            'Unica One','Unlock','Viga','Voltaire','Wire One',
-            // Handwriting
-            'Kalam','Caveat','Indie Flower','Shadows Into Light','Amatic SC',
-            'Permanent Marker','Rock Salt','Special Elite','Architects Daughter',
-            'Bad Script','Caveat Brush','Cedarville Cursive','Chilanka',
-            'Coming Soon','Covered By Your Grace','Crafty Girls','Dawning of a New Day',
-            'Dekko','Delius','Delius Swash Caps','Delius Unicase','Doodle Ipsum',
-            'Edu NSW ACT Foundation','Edu QLD Beginner','Edu SA Beginner','Edu TAS Beginner',
-            'Edu VIC WA NT Beginner','Engagement','Euphoria Script','Felipa',
-            'Fondamento','Fuzzy Bubbles','Give You Glory','Gochi Hand',
-            'Handlee','Happy Monkey','Homemade Apple','Hubballi',
-            'Just Another Hand','Just Me Again Down Here','Kaushan Script',
-            'Kristi','La Belle Aurore','Lacquer','Lancelot','Leckerli One',
-            'Loved by the King','Love Ya Like A Sister','Luckiest Guy',
-            'Mali','Mansalva','Marck Script','Meddon','Meie Script',
-            'Merienda','Merienda One','Miama','Milonga','Miltonian',
-            'Miltonian Tattoo','Miniver','Miss Fajardose','Modak','Molle',
-            'Monda','Monofett','Monoton','Monsieur La Doulaise','Montez',
-            'Mountains of Christmas','Mouse Memoirs','Mr Bedfort','Mr Dafoe',
-            'Mr De Haviland','Mrs Saint Delafield','Mrs Sheppards','Mukta',
-            'Mystery Quest','Neucha','Neuton','New Rocker','New Tegomin',
-            'News Cycle','Niconne','Niramit','Nixie One','Nobile',
-            'Nokora','Norican','Nosifer','Notable','Nothing You Could Do',
-            'Noticia Text','Noto Nastaliq Urdu','Noto Rashi Hebrew',
-            'Noto Sans Arabic','Noto Sans Armenian','Noto Sans Bengali',
-            'Noto Sans Devanagari','Noto Sans Ethiopic','Noto Sans Georgian',
-            'Noto Sans Gujarati','Noto Sans Gurmukhi','Noto Sans Hebrew',
-            'Noto Sans Kannada','Noto Sans Khmer','Noto Sans Lao',
-            'Noto Sans Malayalam','Noto Sans Myanmar','Noto Sans Oriya',
-            'Noto Sans Sinhala','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Thai',
-            // Script / Decorative
-            'Pacifico','Dancing Script','Great Vibes','Sacramento','Satisfy',
-            'Lobster','Lobster Two','Parisienne','Allura','Alex Brush',
-            'Pinyon Script','Italianno','Tangerine','Marck Script',
-            'Courgette','Kaushan Script','Yellowtail','Aguafina Script',
-            'Akronim','Aladin','Alatsi','Aldrich','Alef',
-            'Alegreya','Alegreya SC','Aleo','Alerta','Alfa Slab One',
-            'Alkalami','Alkatra','Allan','Allerta','Allerta Stencil',
-            'Allison','Allura','Almarai','Almendra','Almendra Display',
-            'Almendra SC','Alumni Sans','Alumni Sans Collegiate One',
-            'Alumni Sans Inline One','Alumni Sans Pinstripe','Amarante',
-            'Amaranth','Amatic SC','Amethysta','Amiko','Amiri',
-            'Amita','Anaheim','Andada Pro','Andika','Anek Bangla',
-            'Anek Devanagari','Anek Gujarati','Anek Gurmukhi','Anek Kannada',
-            'Anek Latin','Anek Malayalam','Anek Odia','Anek Tamil','Anek Telugu',
-            'Angkor','Annie Use Your Telescope','Anonymous Pro','Antic',
-            'Antic Didone','Antic Slab','Anton','Antonio','Anuphan',
-            'Anybody','Aoboshi One','Arapey','Arbutus','Arbutus Slab',
-            'Architects Daughter','Archivo','Archivo Black','Archivo Narrow',
-            'Are You Serious','Aref Ruqaa','Aref Ruqaa Ink','Arima',
-            'Arimo','Arizonia','Armata','Arsenal','Artifika',
-            'Arvo','Arya','Asap','Asap Condensed','Asar',
-            'Asset','Assistant','Astloch','Asul','Athiti',
-            'Atkinson Hyperlegible','Atma','Atomic Age','Aubrey','Audiowide',
-            'Autour One','Average','Average Sans','Averia Gruesa Libre',
-            'Averia Libre','Averia Sans Libre','Averia Serif Libre',
+            'Inter','Plus Jakarta Sans','Space Grotesk','Sora','JetBrains Mono',
+            'Playfair Display','Dancing Script','Orbitron','Bebas Neue','Lobster',
+            'Fira Code','Merriweather','Raleway','Poppins','Montserrat',
+            'Lora','Oswald','Pacifico','Caveat','Roboto Mono'
         ];
-
-        const loadedFonts = new Set();
-        const grid = document.getElementById('grid');
-        const toast = document.getElementById('toast');
-
-        // Lazy load font when card enters viewport
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const card = entry.target;
-                    const font = card.dataset.font;
-                    if (!loadedFonts.has(font)) {
-                        loadedFonts.add(font);
-                        const link = document.createElement('link');
-                        link.rel = 'stylesheet';
-                        link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g,'+').replace(/%3A/g,':')}:wght@400;600&display=swap`;
-                        document.head.appendChild(link);
-                    }
-                    observer.unobserve(card);
-                }
-            });
-        }, { rootMargin: '200px' });
-
-        fonts.forEach(font => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.dataset.font = font;
-            card.innerHTML = `
-                <div class="card-header">
-                    <span class="badge">${font}</span>
-                </div>
-                <div class="specimen" style="font-family: '${font}', sans-serif;" contenteditable="true">
-                    The quick brown fox jumps over the lazy dog.
-                </div>
-                <div class="actions">
-                    <button class="btn btn-primary" onclick="copyCode('${font}')">Copy CSS</button>
-                    <button class="btn" onclick="downloadFont('${font}')">Download</button>
-                </div>
-            `;
-            grid.appendChild(card);
-            observer.observe(card);
+        const track = document.getElementById('marquee');
+        [...fonts, ...fonts].forEach(f => {
+            const el = document.createElement('span');
+            el.className = 'marquee-item';
+            el.textContent = f;
+            track.appendChild(el);
         });
-
-        function updateText(val) {
-            document.querySelectorAll('.specimen').forEach(el => {
-                if (el !== document.activeElement) el.innerText = val || "The quick brown fox jumps over the lazy dog.";
-            });
-        }
-
-        function copyCode(fontName) {
-            const code = `@import url('https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@400;600&display=swap');\n\nfont-family: '${fontName}', sans-serif;`;
-            navigator.clipboard.writeText(code).then(() => showToast());
-        }
-
-        async function downloadFont(fontName) {
-            const family = fontName.replace(/ /g, '+');
-            const cssUrl = `https://fonts.googleapis.com/css2?family=${family}:wght@400;600&display=swap`;
-            try {
-                const cssRes = await fetch(cssUrl);
-                const css = await cssRes.text();
-                const urls = [...css.matchAll(/url\((https:\/\/[^)]+)\)/g)].map(m => m[1]);
-                for (const url of urls) {
-                    const res = await fetch(url);
-                    const blob = await res.blob();
-                    const ext = url.split('.').pop().split('?')[0];
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `${fontName.replace(/ /g, '_')}.${ext}`;
-                    a.click();
-                    URL.revokeObjectURL(a.href);
-                }
-            } catch (e) {
-                alert('Download failed. Try downloading from fonts.google.com directly.');
-            }
-        }
-
-        function showToast() {
-            toast.classList.add('toast-visible');
-            setTimeout(() => toast.classList.remove('toast-visible'), 2500);
-        }
     </script>
 
     <script>
-        (function(){
-            const canvas = document.getElementById('bg-canvas');
+        // Light rays — full-page WebGL, mouse-reactive
+        (function () {
+            const canvas = document.getElementById('spotlight-canvas');
             const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
             if (!gl) return;
-            let mouse = {x:0.5,y:0.5}, sm = {x:0.5,y:0.5};
-            function resize(){ const d=Math.min(devicePixelRatio,2); canvas.width=innerWidth*d; canvas.height=innerHeight*d; gl.viewport(0,0,canvas.width,canvas.height); }
+
+            let mouse = { x: 0.5, y: 0.5 }, smoothMouse = { x: 0.5, y: 0.5 };
+
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio, 2);
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
             window.addEventListener('resize', resize);
-            window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/innerWidth; mouse.y=e.clientY/innerHeight; });
-            const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
-            const fs=`precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;
-            float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-            float ray(vec2 src,vec2 dir,vec2 c,float a,float b,float s){vec2 d=c-src;vec2 dn=normalize(d);float ca=dot(dn,dir);float sp=pow(max(ca,0.),6.);float dist=length(d);float f=clamp((r.x*2.-dist)/(r.x*2.),0.,1.);float pulse=.7+.3*sin(t*s+ca*a);float base=clamp(.45+.15*sin(ca*a+t*s)+.3+.2*cos(-ca*b+t*s),0.,1.);return base*f*sp*pulse;}
-            void main(){vec2 c=vec2(gl_FragCoord.x,r.y-gl_FragCoord.y);vec2 src=vec2(r.x*(.5+(m.x-.5)*.12),-r.y*.04);vec2 dir=normalize(vec2((m.x-.5)*.18,1.));float rays=ray(src,dir,c,36.22,21.11,1.5)*.55+ray(src,dir,c,22.4,18.02,1.1)*.4;vec3 col=rays*vec3(.55,.52,1.);col*=.15+(1.-c.y/r.y)*.85;float star=0.;for(int i=0;i<3;i++){vec2 cell=floor(c/(80.+float(i)*40.));vec2 h2=vec2(h(cell+float(i)*7.3),h(cell+float(i)*13.7));vec2 sp=(cell+h2)*(80.+float(i)*40.);float d=length(c-sp);float tw=.5+.5*sin(t*(1.5+h2.x*3.)+h2.y*6.28);star+=tw*smoothstep(1.8,0.,d)*(.3+h2.x*.7);}col+=star*vec3(.85,.88,1.)*.6;gl_FragColor=vec4(col,rays*.92+star*.5);}`;
-            function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
-            const prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);
-            const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
-            const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-            gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
-            const uT=gl.getUniformLocation(prog,'t'),uR=gl.getUniformLocation(prog,'r'),uM=gl.getUniformLocation(prog,'m');
+
+            window.addEventListener('mousemove', e => {
+                mouse.x = e.clientX / window.innerWidth;
+                mouse.y = e.clientY / window.innerHeight;
+            });
+
+            const vert = `
+                attribute vec2 a_pos;
+                void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+            `;
+
+            const frag = `
+                precision highp float;
+                uniform float u_time;
+                uniform vec2  u_res;
+                uniform vec2  u_mouse;
+
+                float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+                float rayStr(vec2 src, vec2 dir, vec2 coord, float seedA, float seedB, float spd) {
+                    vec2 toCoord = coord - src;
+                    vec2 dn = normalize(toCoord);
+                    float cosA = dot(dn, dir);
+                    float spread = pow(max(cosA, 0.0), 6.0);
+                    float dist = length(toCoord);
+                    float maxD = u_res.x * 2.0;
+                    float falloff = clamp((maxD - dist) / maxD, 0.0, 1.0);
+                    float pulse = 0.7 + 0.3 * sin(u_time * spd + cosA * seedA);
+                    float base = clamp(
+                        0.45 + 0.15 * sin(cosA * seedA + u_time * spd) +
+                        0.30 + 0.20 * cos(-cosA * seedB + u_time * spd),
+                        0.0, 1.0
+                    );
+                    return base * falloff * spread * pulse;
+                }
+
+                void main() {
+                    vec2 coord = vec2(gl_FragCoord.x, u_res.y - gl_FragCoord.y);
+
+                    vec2 src = vec2(u_res.x * (0.5 + (u_mouse.x - 0.5) * 0.12), -u_res.y * 0.04);
+                    vec2 dir = normalize(vec2((u_mouse.x - 0.5) * 0.18, 1.0));
+
+                    float r1 = rayStr(src, dir, coord, 36.22, 21.11, 1.5);
+                    float r2 = rayStr(src, dir, coord, 22.40, 18.02, 1.1);
+                    float rays = r1 * 0.55 + r2 * 0.40;
+
+                    vec3 rayColor = vec3(0.55, 0.52, 1.0);
+                    vec3 col = rays * rayColor;
+
+                    float vFade = 1.0 - (coord.y / u_res.y);
+                    col *= 0.15 + vFade * 0.85;
+
+                    // Stars
+                    float star = 0.0;
+                    for (int i = 0; i < 3; i++) {
+                        vec2 cell = floor(coord / (80.0 + float(i) * 40.0));
+                        vec2 h2 = vec2(hash(cell + float(i) * 7.3), hash(cell + float(i) * 13.7));
+                        vec2 starPos = (cell + h2) * (80.0 + float(i) * 40.0);
+                        float d = length(coord - starPos);
+                        float twinkle = 0.5 + 0.5 * sin(u_time * (1.5 + h2.x * 3.0) + h2.y * 6.28);
+                        star += twinkle * smoothstep(1.8, 0.0, d) * (0.3 + h2.x * 0.7);
+                    }
+                    col += star * vec3(0.85, 0.88, 1.0) * 0.6;
+
+                    gl_FragColor = vec4(col, rays * 0.92 + star * 0.5);
+                }
+            `;
+
+            function compile(type, src) {
+                const s = gl.createShader(type);
+                gl.shaderSource(s, src); gl.compileShader(s);
+                return s;
+            }
+            const prog = gl.createProgram();
+            gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
+            gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
+            gl.linkProgram(prog); gl.useProgram(prog);
+
+            const buf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+            const loc = gl.getAttribLocation(prog, 'a_pos');
+            gl.enableVertexAttribArray(loc);
+            gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+            const uTime  = gl.getUniformLocation(prog, 'u_time');
+            const uRes   = gl.getUniformLocation(prog, 'u_res');
+            const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
             resize();
-            function loop(ts){const s=.93;sm.x=sm.x*s+mouse.x*(1-s);sm.y=sm.y*s+mouse.y*(1-s);gl.uniform1f(uT,ts*.001);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform2f(uM,sm.x,sm.y);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(loop);}
+
+            function loop(t) {
+                const sm = 0.93;
+                smoothMouse.x = smoothMouse.x * sm + mouse.x * (1 - sm);
+                smoothMouse.y = smoothMouse.y * sm + mouse.y * (1 - sm);
+
+                gl.uniform1f(uTime, t * 0.001);
+                gl.uniform2f(uRes, canvas.width, canvas.height);
+                gl.uniform2f(uMouse, smoothMouse.x, smoothMouse.y);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                requestAnimationFrame(loop);
+            }
             requestAnimationFrame(loop);
         })();
     </script>
 
+    <!-- Background music -->
     <audio id="bg-music" src="Blissful.mp3" loop preload="auto"></audio>
     <button id="music-btn" title="Toggle music" aria-label="Toggle music">
         <svg id="music-icon-on" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         <svg id="music-icon-off" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-        <span class="music-label">Blissful</span>
+        <span class="music-label" id="music-label">Blissful</span>
     </button>
     <style>
-        #music-btn { position:fixed;bottom:24px;right:24px;left:auto;z-index:999;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;background:rgba(7,8,15,0.7);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);cursor:pointer;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;letter-spacing:0.2px;transition:all 0.2s;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);white-space:nowrap; }
-        #music-btn:hover { background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.22);color:#fff; }
-        #music-btn.muted { color:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.07); }
-        #music-btn .music-label { font-size:11px; }
+        #music-btn {
+            position: fixed; bottom: 24px; right: 24px; left: auto; z-index: 999;
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 14px; border-radius: 8px;
+            background: rgba(7,8,15,0.7); border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.6); cursor: pointer; font-size: 12px; font-weight: 500;
+            font-family: 'Inter', sans-serif; letter-spacing: 0.2px;
+            transition: all 0.2s; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            white-space: nowrap;
+        }
+        #music-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); color: #fff; }
+        #music-btn.muted { color: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.07); }
+        #music-btn .music-label { font-size: 11px; }
     </style>
     <script>
-        (function(){const music=document.getElementById('bg-music'),btn=document.getElementById('music-btn'),on=document.getElementById('music-icon-on'),off=document.getElementById('music-icon-off');let playing=false;music.volume=0.35;function play(){music.play().then(()=>{playing=true;btn.classList.remove('muted');on.style.display='';off.style.display='none';}).catch(()=>{});}function first(){play();document.removeEventListener('click',first);document.removeEventListener('keydown',first);document.removeEventListener('touchstart',first);}document.addEventListener('click',first);document.addEventListener('keydown',first);document.addEventListener('touchstart',first);btn.addEventListener('click',e=>{e.stopPropagation();if(playing){music.pause();playing=false;btn.classList.add('muted');on.style.display='none';off.style.display='';}else{play();}});})();
+        (function () {
+            const music = document.getElementById('bg-music');
+            const btn   = document.getElementById('music-btn');
+            const iconOn  = document.getElementById('music-icon-on');
+            const iconOff = document.getElementById('music-icon-off');
+            let playing = false;
+
+            music.volume = 0.35;
+
+            function play() {
+                music.play().then(() => {
+                    playing = true;
+                    btn.classList.remove('muted');
+                    iconOn.style.display = ''; iconOff.style.display = 'none';
+                }).catch(() => {});
+            }
+
+            // Autoplay on first interaction or music-allow event
+            function onFirstInteract() {
+                play();
+                document.removeEventListener('click', onFirstInteract);
+                document.removeEventListener('keydown', onFirstInteract);
+                document.removeEventListener('touchstart', onFirstInteract);
+                document.removeEventListener('ts-music-allow', onFirstInteract);
+            }
+            document.addEventListener('ts-music-allow', onFirstInteract);
+
+            // Toggle button
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                if (playing) {
+                    music.pause();
+                    playing = false;
+                    btn.classList.add('muted');
+                    iconOn.style.display = 'none'; iconOff.style.display = '';
+                } else {
+                    play();
+                }
+            });
+        })();
     </script>
     <script src="chatbot.js"></script>
+    <script src="tooltip.js"></script>
+    <script>
+    (function(){
+      const canvas=document.createElement('canvas');
+      canvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+      document.body.appendChild(canvas);
+      const ctx=canvas.getContext('2d');
+      function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+      window.addEventListener('resize',resize);resize();
+
+      const SPARK_COLOR='#fff';
+      const SPARK_COUNT=8;
+      const SPARK_RADIUS=40;
+      const SPARK_SIZE=12;
+      const DURATION=500;
+
+      let sparks=[];
+      function ease(t){return t*(2-t);}
+
+      function loop(ts){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        sparks=sparks.filter(s=>{
+          const p=(ts-s.t)/DURATION;
+          if(p>=1)return false;
+          const e=ease(p);
+          const dist=e*SPARK_RADIUS;
+          const len=SPARK_SIZE*(1-e);
+          const x1=s.x+dist*Math.cos(s.a);
+          const y1=s.y+dist*Math.sin(s.a);
+          const x2=s.x+(dist+len)*Math.cos(s.a);
+          const y2=s.y+(dist+len)*Math.sin(s.a);
+          ctx.globalAlpha=1-e;
+          ctx.strokeStyle=SPARK_COLOR;
+          ctx.lineWidth=2;
+          ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+          return true;
+        });
+        ctx.globalAlpha=1;
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+
+      document.addEventListener('click',e=>{
+        const now=performance.now();
+        for(let i=0;i<SPARK_COUNT;i++){
+          sparks.push({x:e.clientX,y:e.clientY,a:(2*Math.PI*i)/SPARK_COUNT,t:now});
+        }
+      });
+    })();
+    </script>
+    <script>
+    (function(){
+      const c=document.createElement('canvas');
+      c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;';
+      document.body.appendChild(c);
+      const gl=c.getContext('webgl');
+      if(!gl)return;
+      function resize(){c.width=innerWidth;c.height=innerHeight;gl.viewport(0,0,c.width,c.height);}
+      window.addEventListener('resize',resize);resize();
+
+      const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+      const fs=`
+        precision highp float;
+        uniform vec2 res;
+        uniform float t;
+        uniform vec2 mouse;
+        #define N 6
+        void main(){
+          vec2 uv=gl_FragCoord.xy/res;
+          vec2 b[N];
+          b[0]=mouse;
+          b[1]=vec2(0.5+0.28*sin(t*0.7+0.0),  0.5+0.22*cos(t*0.5+1.0));
+          b[2]=vec2(0.5+0.30*cos(t*0.4+2.1),  0.5+0.25*sin(t*0.6+0.5));
+          b[3]=vec2(0.5+0.22*sin(t*0.9+3.5),  0.5+0.30*cos(t*0.3+2.2));
+          b[4]=vec2(0.5+0.35*cos(t*0.5+1.2),  0.5+0.18*sin(t*0.8+3.1));
+          b[5]=vec2(0.5+0.20*sin(t*0.6+4.0),  0.5+0.28*cos(t*0.7+1.8));
+          float r[N];
+          r[0]=0.055; r[1]=0.048; r[2]=0.052;
+          r[3]=0.044; r[4]=0.050; r[5]=0.046;
+          vec2 asp=vec2(res.x/res.y,1.0);
+          float field=0.0;
+          for(int i=0;i<N;i++){
+            vec2 d=(uv-b[i])*asp;
+            float dist2=dot(d,d);
+            field+=r[i]*r[i]/max(dist2,0.00001);
+          }
+          float threshold=1.0;
+          float edge=fwidth(field)*1.5;
+          float alpha=smoothstep(threshold-edge,threshold+edge,field);
+          vec3 col=mix(vec3(0.18,0.14,0.45),vec3(0.55,0.35,0.95),smoothstep(1.0,2.5,field));
+          col=mix(col,vec3(0.85,0.75,1.0),smoothstep(2.5,5.0,field));
+          gl_FragColor=vec4(col,alpha*0.55);
+        }
+      `;
+      function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+      const prog=gl.createProgram();
+      gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));
+      gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));
+      gl.linkProgram(prog);gl.useProgram(prog);
+      const buf=gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+      gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+      const loc=gl.getAttribLocation(prog,'p');
+      gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+      gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+      const uRes=gl.getUniformLocation(prog,'res');
+      const uT=gl.getUniformLocation(prog,'t');
+      const uMouse=gl.getUniformLocation(prog,'mouse');
+      let mx=0.5,my=0.5,tx=0.5,ty=0.5;
+      window.addEventListener('mousemove',e=>{tx=e.clientX/innerWidth;ty=1-e.clientY/innerHeight;});
+      function loop(ts){
+        mx+=(tx-mx)*0.08; my+=(ty-my)*0.08;
+        gl.uniform2f(uRes,c.width,c.height);
+        gl.uniform1f(uT,ts*0.001);
+        gl.uniform2f(uMouse,mx,my);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES,0,3);
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    })();
+    </script>
+<!-- Library Floating Dock -->
+<style>
+#lib-dock {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(calc(100% + 32px));
+    z-index:10000;
+    display:flex; align-items:center; gap:4px;
+    background:#0d0e1a;
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px;
+    padding:8px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(129,140,248,0.07);
+    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+    opacity:0; pointer-events:none;
+}
+#lib-dock.open { transform:translateX(-50%) translateY(0); opacity:1; pointer-events:all; }
+.dock-item { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 14px; border-radius:14px; text-decoration:none; border:1px solid transparent; transition:background 0.18s, border-color 0.18s, transform 0.18s; min-width:62px; }
+.dock-item:hover { transform:translateY(-3px); }
+.dock-item-fonts  { color:#818cf8; } .dock-item-fonts:hover  { background:rgba(129,140,248,0.1); border-color:rgba(129,140,248,0.2); }
+.dock-item-icons  { color:#c084fc; } .dock-item-icons:hover  { background:rgba(192,132,252,0.1); border-color:rgba(192,132,252,0.2); }
+.dock-item-colors { color:#34d399; } .dock-item-colors:hover { background:rgba(52,211,153,0.1);  border-color:rgba(52,211,153,0.2); }
+.dock-item-motion { color:#fbbf24; } .dock-item-motion:hover { background:rgba(251,191,36,0.1);  border-color:rgba(251,191,36,0.2); }
+.dock-item-illus  { color:#fb7185; } .dock-item-illus:hover  { background:rgba(251,113,133,0.1); border-color:rgba(251,113,133,0.2); }
+.dock-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+.dock-item-fonts  .dock-icon { background:rgba(129,140,248,0.12); border:1px solid rgba(129,140,248,0.18); }
+.dock-item-icons  .dock-icon { background:rgba(192,132,252,0.12); border:1px solid rgba(192,132,252,0.18); }
+.dock-item-colors .dock-icon { background:rgba(52,211,153,0.12);  border:1px solid rgba(52,211,153,0.18); }
+.dock-item-motion .dock-icon { background:rgba(251,191,36,0.12);  border:1px solid rgba(251,191,36,0.18); }
+.dock-item-illus  .dock-icon { background:rgba(251,113,133,0.12); border:1px solid rgba(251,113,133,0.18); }
+.dock-label { font-size:10px; font-weight:600; letter-spacing:0.2px; font-family:"Inter",sans-serif; }
+.dock-sep { width:1px; height:40px; background:rgba(255,255,255,0.07); flex-shrink:0; margin:0 2px; }
+@media(max-width:520px) { #lib-dock { gap:2px; padding:6px; } .dock-item { padding:8px 10px; min-width:50px; } .dock-label { display:none; } }
+</style>
+
+<div id="lib-dock">
+    <a href="fonts.html" class="dock-item dock-item-fonts">
+        <div class="dock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+        <span class="dock-label">Fonts</span>
+    </a>
+    <a href="icons.html" class="dock-item dock-item-icons">
+        <div class="dock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m.7 11.4-.7-.7M6.3 18.4l-.7.7"/></svg></div>
+        <span class="dock-label">Icons</span>
+    </a>
+    <a href="colors.html" class="dock-item dock-item-colors">
+        <div class="dock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22a7 7 0 0 0 7-7c0-2.38-1.19-4.47-3-5.74V9a5 5 0 0 0-10 0v.26C4.19 10.53 3 12.62 3 15a7 7 0 0 0 7 7h2z"/></svg></div>
+        <span class="dock-label">Colors</span>
+    </a>
+    <div class="dock-sep"></div>
+    <a href="motion.html" class="dock-item dock-item-motion">
+        <div class="dock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <span class="dock-label">Motion</span>
+    </a>
+    <a href="illustrations.html" class="dock-item dock-item-illus">
+        <div class="dock-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <span class="dock-label">Illus</span>
+    </a>
+</div>
+
+<script>
+    function toggleLibraryDock(){
+        document.getElementById('lib-dock').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        var dock = document.getElementById('lib-dock');
+        if(dock.classList.contains('open') && !dock.contains(e.target) && !e.target.closest('button[onclick]')) {
+            dock.classList.remove('open');
+        }
+    });
+    document.addEventListener('keydown', function(e) {
+        if(e.key === 'Escape') document.getElementById('lib-dock').classList.remove('open');
+    });
+</script>
+<script>
+(function(){const s=new Audio('click.mp3');s.volume=0.35;document.addEventListener('click',function(e){if(e.target.closest('button,a,.cat-btn,.dock-item,.copy-btn,.btn,.nav-link,.size-btn')){const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});}});})();
+</script>
+<style>.click-ripple{position:fixed;pointer-events:none;z-index:99999;border-radius:50%;transform:scale(0);animation:click-ripple-anim 0.5s ease-out forwards;}@keyframes click-ripple-anim{0%{transform:scale(0);opacity:0.7;}100%{transform:scale(1);opacity:0;}}</style>
+<script>
+(function(){
+  const s=new Audio("click.mp3");s.volume=0.35;
+  document.addEventListener("click",function(e){
+    if(e.target.closest("button,a,.cat-btn,.dock-item,.copy-btn,.btn,.nav-link,.size-btn,.illus-btn,.peep-btn,.color-swatch,.icon-card")){
+      const c=s.cloneNode();c.volume=0.35;c.play().catch(()=>{});
+    }
+    const r=document.createElement("div");
+    r.className="click-ripple";
+    const size=60;
+    r.style.cssText="width:"+size+"px;height:"+size+"px;left:"+(e.clientX-size/2)+"px;top:"+(e.clientY-size/2)+"px;background:radial-gradient(circle,rgba(129,140,248,0.55) 0%,rgba(192,132,252,0.2) 50%,transparent 70%);";
+    document.body.appendChild(r);
+    setTimeout(()=>r.remove(),500);
+  });
+})();
+</script>
 </body>
 </html>
