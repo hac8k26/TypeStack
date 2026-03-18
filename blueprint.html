@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blueprint Schematic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f5f0e8; overflow: hidden; width: 100vw; height: 100vh; font-family: 'Courier New', monospace; }
+    canvas { display: block; position: fixed; top: 0; left: 0; }
+
+    #ui {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .label {
+      position: absolute;
+      color: rgba(140,80,40,0.75);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .corner {
+      position: absolute;
+      width: 18px; height: 18px;
+      border-color: rgba(194,113,79,0.5);
+      border-style: solid;
+    }
+    .corner.tl { top: 18px; left: 18px; border-width: 2px 0 0 2px; }
+    .corner.tr { top: 18px; right: 18px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 18px; left: 18px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 18px; right: 18px; border-width: 0 2px 2px 0; }
+
+    #title {
+      position: absolute;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(140,80,40,0.6);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    #rev {
+      position: absolute;
+      top: 22px; right: 44px;
+      color: rgba(140,80,40,0.45);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+    }
+
+    #sheet {
+      position: absolute;
+      top: 22px; left: 44px;
+      color: rgba(140,80,40,0.45);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+    }
+
+    #scanline {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: rgba(194,113,79,0.07);
+      animation: scan 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scan {
+      0%   { top: 0; }
+      100% { top: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="ui">
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+  <div id="sheet">SHEET 01 / DWG-4471-A</div>
+  <div id="rev">REV 3.2 &nbsp;|&nbsp; SCALE 1:100</div>
+  <div id="title">TECHNICAL SCHEMATIC — SYSTEM ARCHITECTURE OVERVIEW</div>
+</div>
+
+<div id="scanline"></div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+let W, H, t = 0;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  buildScene();
+}
+window.addEventListener('resize', resize);
+
+// ── Palette ──────────────────────────────────────────────────────────────────
+const C = {
+  bg:      '#f5f0e8',
+  grid:    'rgba(180,120,80,0.10)',
+  gridSub: 'rgba(180,120,80,0.04)',
+  line:    'rgba(194,113,79,0.55)',
+  lineDim: 'rgba(194,113,79,0.22)',
+  accent:  'rgba(194,113,79,0.95)',
+  fill:    'rgba(194,113,79,0.04)',
+  fillMid: 'rgba(194,113,79,0.08)',
+  text:    'rgba(120,70,35,0.75)',
+  textDim: 'rgba(120,70,35,0.38)',
+  pulse:   'rgba(194,113,79,1)',
+};
+
+// ── Grid ─────────────────────────────────────────────────────────────────────
+function drawGrid() {
+  const step    = 40;
+  const subStep = 10;
+
+  // sub-grid
+  ctx.strokeStyle = C.gridSub;
+  ctx.lineWidth   = 0.5;
+  for (let x = 0; x < W; x += subStep) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += subStep) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // main grid
+  ctx.strokeStyle = C.grid;
+  ctx.lineWidth   = 1;
+  for (let x = 0; x < W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+}
+
+// ── Crosshair ────────────────────────────────────────────────────────────────
+function drawCrosshair(x, y, size = 12) {
+  ctx.strokeStyle = C.accent;
+  ctx.lineWidth   = 1;
+  ctx.beginPath();
+  ctx.moveTo(x - size, y); ctx.lineTo(x + size, y);
+  ctx.moveTo(x, y - size); ctx.lineTo(x, y + size);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+// ── Dimension line ───────────────────────────────────────────────────────────
+function drawDimLine(x1, y1, x2, y2, label, offset = 16) {
+  const isH = Math.abs(y2 - y1) < Math.abs(x2 - x1);
+  const ox  = isH ? 0 : offset;
+  const oy  = isH ? -offset : 0;
+
+  ctx.strokeStyle = C.lineDim;
+  ctx.lineWidth   = 0.8;
+  ctx.setLineDash([4, 4]);
+
+  // extension lines
+  ctx.beginPath();
+  ctx.moveTo(x1, y1); ctx.lineTo(x1 + ox, y1 + oy);
+  ctx.moveTo(x2, y2); ctx.lineTo(x2 + ox, y2 + oy);
+  ctx.stroke();
+
+  // dimension line with arrows
+  ctx.beginPath();
+  ctx.moveTo(x1 + ox, y1 + oy);
+  ctx.lineTo(x2 + ox, y2 + oy);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // arrowheads
+  const angle = Math.atan2((y2 + oy) - (y1 + oy), (x2 + ox) - (x1 + ox));
+  [[x1 + ox, y1 + oy, angle + Math.PI], [x2 + ox, y2 + oy, angle]].forEach(([ax, ay, a]) => {
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(ax + Math.cos(a - 0.3) * 7, ay + Math.sin(a - 0.3) * 7);
+    ctx.lineTo(ax + Math.cos(a + 0.3) * 7, ay + Math.sin(a + 0.3) * 7);
+    ctx.closePath();
+    ctx.fillStyle = C.lineDim;
+    ctx.fill();
+  });
+
+  // label
+  const mx = (x1 + x2) / 2 + ox;
+  const my = (y1 + y2) / 2 + oy - 6;
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '9px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, mx, my);
+}
+
+// ── Animated data path ───────────────────────────────────────────────────────
+class DataPath {
+  constructor(points, speed = 0.4) {
+    this.points = points;
+    this.speed  = speed;
+    this.offset = Math.random() * 200;
+  }
+
+  totalLength() {
+    let len = 0;
+    for (let i = 1; i < this.points.length; i++) {
+      const dx = this.points[i][0] - this.points[i-1][0];
+      const dy = this.points[i][1] - this.points[i-1][1];
+      len += Math.sqrt(dx*dx + dy*dy);
+    }
+    return len;
+  }
+
+  draw(t) {
+    const pts = this.points;
+
+    // static dashed path
+    ctx.strokeStyle = C.lineDim;
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // animated pulse dot
+    const total = this.totalLength();
+    const pos   = ((t * this.speed * 60 + this.offset) % total);
+    let   acc   = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const dx   = pts[i][0] - pts[i-1][0];
+      const dy   = pts[i][1] - pts[i-1][1];
+      const segL = Math.sqrt(dx*dx + dy*dy);
+      if (acc + segL >= pos) {
+        const frac = (pos - acc) / segL;
+        const px   = pts[i-1][0] + dx * frac;
+        const py   = pts[i-1][1] + dy * frac;
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fillStyle   = C.pulse;
+        ctx.shadowColor = C.pulse;
+        ctx.shadowBlur  = 10;
+        ctx.fill();
+        ctx.shadowBlur  = 0;
+        break;
+      }
+      acc += segL;
+    }
+  }
+}
+
+// ── Module box ───────────────────────────────────────────────────────────────
+class Module {
+  constructor(x, y, w, h, title, lines = [], type = 'rect') {
+    this.x = x; this.y = y; this.w = w; this.h = h;
+    this.title = title; this.lines = lines; this.type = type;
+    this.phase = Math.random() * Math.PI * 2;
+  }
+
+  draw(t) {
+    const { x, y, w, h } = this;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 1.2 + this.phase);
+
+    ctx.strokeStyle = C.line;
+    ctx.lineWidth   = 1.2;
+    ctx.fillStyle   = C.fill;
+
+    if (this.type === 'hex') {
+      this._hexPath(x + w/2, y + h/2, Math.min(w, h) / 2);
+      ctx.fill(); ctx.stroke();
+    } else if (this.type === 'diamond') {
+      ctx.beginPath();
+      ctx.moveTo(x + w/2, y);
+      ctx.lineTo(x + w, y + h/2);
+      ctx.lineTo(x + w/2, y + h);
+      ctx.lineTo(x, y + h/2);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+    } else {
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x, y, w, h);
+      // corner ticks
+      const tk = 6;
+      ctx.strokeStyle = C.accent;
+      ctx.lineWidth   = 1.5;
+      [[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(([cx,cy], i) => {
+        const sx = i % 2 === 0 ? 1 : -1;
+        const sy = i < 2 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(cx + sx*tk, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy*tk);
+        ctx.stroke();
+      });
+    }
+
+    // title bar
+    ctx.fillStyle = `rgba(194,113,79,${0.06 + pulse * 0.04})`;
+    ctx.fillRect(x + 1, y + 1, w - 2, 16);
+
+    ctx.fillStyle = C.accent;
+    ctx.font      = 'bold 9px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText(this.title, x + w/2, y + 12);
+
+    // content lines
+    ctx.fillStyle = C.text;
+    ctx.font      = '8px Courier New';
+    this.lines.forEach((l, i) => {
+      ctx.fillText(l, x + w/2, y + 28 + i * 13);
+    });
+
+    // status dot
+    ctx.beginPath();
+    ctx.arc(x + w - 10, y + 9, 3, 0, Math.PI * 2);
+    ctx.fillStyle   = `rgba(180,140,60,${0.5 + pulse * 0.5})`;
+    ctx.shadowColor = 'rgba(180,140,60,0.8)';
+    ctx.shadowBlur  = 6 * pulse;
+    ctx.fill();
+    ctx.shadowBlur  = 0;
+  }
+
+  _hexPath(cx, cy, r) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 - Math.PI / 6;
+      i === 0 ? ctx.moveTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r)
+              : ctx.lineTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+    }
+    ctx.closePath();
+  }
+}
+
+// ── Radar / circle widget ────────────────────────────────────────────────────
+function drawRadar(cx, cy, r, t) {
+  // rings
+  [1, 0.66, 0.33].forEach(f => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * f, 0, Math.PI * 2);
+    ctx.strokeStyle = C.lineDim;
+    ctx.lineWidth   = 0.8;
+    ctx.stroke();
+  });
+
+  // cross
+  ctx.strokeStyle = C.lineDim;
+  ctx.lineWidth   = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy);
+  ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r);
+  ctx.stroke();
+
+  // sweep
+  const sweep = t * 0.8;
+  const grad  = ctx.createConicalGradient
+    ? null
+    : (() => {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, 'rgba(194,113,79,0.15)');
+        g.addColorStop(1, 'rgba(194,113,79,0)');
+        return g;
+      })();
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(sweep);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.arc(0, 0, r, -0.4, 0);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(194,113,79,0.12)';
+  ctx.fill();
+
+  // sweep line
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(r, 0);
+  ctx.strokeStyle = C.accent;
+  ctx.lineWidth   = 1.2;
+  ctx.stroke();
+  ctx.restore();
+
+  // blips
+  const blips = [[0.4, 0.6], [0.7, 0.2], [0.55, 0.8], [0.2, 0.45]];
+  blips.forEach(([fr, fa]) => {
+    const a  = fa * Math.PI * 2;
+    const bx = cx + Math.cos(a) * r * fr;
+    const by = cy + Math.sin(a) * r * fr;
+    const bpulse = 0.5 + 0.5 * Math.sin(t * 3 + fa * 10);
+    ctx.beginPath();
+    ctx.arc(bx, by, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle   = `rgba(180,140,60,${bpulse})`;
+    ctx.shadowColor = 'rgba(180,140,60,0.9)';
+    ctx.shadowBlur  = 8;
+    ctx.fill();
+    ctx.shadowBlur  = 0;
+  });
+
+  // label
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '8px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText('RADAR / SCAN', cx, cy + r + 14);
+}
+
+// ── Waveform widget ──────────────────────────────────────────────────────────
+function drawWaveform(x, y, w, h, t) {
+  ctx.strokeStyle = C.lineDim;
+  ctx.lineWidth   = 0.8;
+  ctx.strokeRect(x, y, w, h);
+
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '8px Courier New';
+  ctx.textAlign = 'left';
+  ctx.fillText('SIG / WAVEFORM', x + 4, y - 4);
+
+  // baseline
+  ctx.strokeStyle = 'rgba(194,113,79,0.15)';
+  ctx.lineWidth   = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(x, y + h/2); ctx.lineTo(x + w, y + h/2);
+  ctx.stroke();
+
+  // wave
+  ctx.strokeStyle = C.accent;
+  ctx.lineWidth   = 1.2;
+  ctx.shadowColor = C.accent;
+  ctx.shadowBlur  = 6;
+  ctx.beginPath();
+  for (let i = 0; i <= w; i++) {
+    const fx  = i / w;
+    const val = Math.sin(fx * Math.PI * 8 - t * 3) * 0.4
+              + Math.sin(fx * Math.PI * 3 - t * 1.5) * 0.3
+              + Math.sin(fx * Math.PI * 14 - t * 5) * 0.15;
+    const py  = y + h/2 + val * (h * 0.42);
+    i === 0 ? ctx.moveTo(x + i, py) : ctx.lineTo(x + i, py);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+// ── Gauge widget ─────────────────────────────────────────────────────────────
+function drawGauge(cx, cy, r, value, label, t) {
+  const start = Math.PI * 0.75;
+  const end   = Math.PI * 2.25;
+  const range = end - start;
+
+  // track
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, start, end);
+  ctx.strokeStyle = C.lineDim;
+  ctx.lineWidth   = 3;
+  ctx.stroke();
+
+  // fill
+  const v = 0.4 + 0.35 * Math.sin(t * 0.5 + cx);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, start, start + range * v);
+  ctx.strokeStyle = C.accent;
+  ctx.lineWidth   = 3;
+  ctx.shadowColor = C.accent;
+  ctx.shadowBlur  = 8;
+  ctx.stroke();
+  ctx.shadowBlur  = 0;
+
+  // tick marks
+  for (let i = 0; i <= 10; i++) {
+    const a  = start + (i / 10) * range;
+    const r1 = r - 6, r2 = r + 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a)*r1, cy + Math.sin(a)*r1);
+    ctx.lineTo(cx + Math.cos(a)*r2, cy + Math.sin(a)*r2);
+    ctx.strokeStyle = C.lineDim;
+    ctx.lineWidth   = 0.8;
+    ctx.stroke();
+  }
+
+  // value text
+  ctx.fillStyle = C.accent;
+  ctx.font      = 'bold 11px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText((v * 100).toFixed(0) + '%', cx, cy + 4);
+
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '8px Courier New';
+  ctx.fillText(label, cx, cy + r + 14);
+}
+
+// ── Annotation ───────────────────────────────────────────────────────────────
+function drawAnnotation(x, y, text, dir = 'right') {
+  const len = 40;
+  const ex  = dir === 'right' ? x + len : x - len;
+
+  ctx.strokeStyle = C.lineDim;
+  ctx.lineWidth   = 0.8;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(x, y); ctx.lineTo(ex, y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath();
+  ctx.arc(x, y, 2, 0, Math.PI * 2);
+  ctx.fillStyle = C.accent;
+  ctx.fill();
+
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '8px Courier New';
+  ctx.textAlign = dir === 'right' ? 'left' : 'right';
+  ctx.fillText(text, ex + (dir === 'right' ? 4 : -4), y + 3);
+}
+
+// ── Scene ────────────────────────────────────────────────────────────────────
+let modules, paths;
+
+function buildScene() {
+  const cx = W / 2, cy = H / 2;
+
+  modules = [
+    new Module(cx - 340, cy - 160, 130, 80,  'CORE CPU',    ['CLK: 3.8 GHz','CACHE: 32MB','THREADS: 16']),
+    new Module(cx - 160, cy - 200, 110, 70,  'MEMORY BUS',  ['DDR5-6400','128-BIT','ECC ON']),
+    new Module(cx + 60,  cy - 200, 110, 70,  'NET STACK',   ['10G ETH','LATENCY: 0.4ms','PKT/S: 14M']),
+    new Module(cx + 200, cy - 160, 130, 80,  'GPU ARRAY',   ['CORES: 4096','VRAM: 24GB','TDP: 350W']),
+    new Module(cx - 340, cy + 80,  130, 80,  'STORAGE I/O', ['NVMe x4','7.4 GB/s','RAID-Z2']),
+    new Module(cx + 200, cy + 80,  130, 80,  'POWER MGMT',  ['48V BUS','EFF: 94%','UPS: ON']),
+    new Module(cx - 80,  cy + 120, 160, 70,  'SIGNAL PROC', ['FFT: 1024','SR: 192kHz','SNR: 120dB']),
+  ];
+
+  paths = [
+    new DataPath([[cx-210, cy-160],[cx-160, cy-165]], 0.5),
+    new DataPath([[cx-50,  cy-165],[cx+60,  cy-165]], 0.4),
+    new DataPath([[cx+170, cy-165],[cx+200, cy-160]], 0.5),
+    new DataPath([[cx-275, cy-80], [cx-275, cy+80]],  0.3),
+    new DataPath([[cx+265, cy-80], [cx+265, cy+80]],  0.3),
+    new DataPath([[cx-210, cy+120],[cx-80,  cy+155]], 0.45),
+    new DataPath([[cx+80,  cy+155],[cx+200, cy+120]], 0.45),
+    new DataPath([[cx-160, cy-130],[cx-80,  cy-30],  [cx+80, cy-30],[cx+170, cy-130]], 0.35),
+  ];
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // bg
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  drawGrid();
+
+  // border frame
+  const pad = 14;
+  ctx.strokeStyle = 'rgba(194,113,79,0.3)';
+  ctx.lineWidth   = 1;
+  ctx.strokeRect(pad, pad, W - pad*2, H - pad*2);
+
+  // data paths
+  paths.forEach(p => p.draw(t));
+
+  // modules
+  modules.forEach(m => m.draw(t));
+
+  // radar (bottom-left area)
+  const rx = 110, ry = H - 130;
+  drawRadar(rx, ry, 70, t);
+
+  // waveform (bottom-right area)
+  drawWaveform(W - 280, H - 110, 240, 60, t);
+
+  // gauges
+  drawGauge(W - 340, H/2, 32, 0, 'CPU LOAD', t);
+  drawGauge(W - 280, H/2, 32, 0, 'MEM USE',  t + 1);
+  drawGauge(W - 220, H/2, 32, 0, 'NET I/O',  t + 2);
+
+  // crosshairs
+  drawCrosshair(W/2, H/2, 16);
+  drawCrosshair(110, H - 130, 8);
+
+  // dimension lines
+  drawDimLine(W/2 - 340, H/2 - 200, W/2 + 330, H/2 - 200, '670 UNITS', 20);
+  drawDimLine(W/2 + 340, H/2 - 160, W/2 + 340, H/2 + 160, '320 UNITS', 20);
+
+  // annotations
+  drawAnnotation(W/2, H/2, 'ORIGIN [0,0]', 'right');
+  drawAnnotation(110, H - 200, 'SCAN ARRAY', 'right');
+
+  // floating coords
+  ctx.fillStyle = C.textDim;
+  ctx.font      = '9px Courier New';
+  ctx.textAlign = 'left';
+  const cx = (W/2 + Math.sin(t*0.3)*5).toFixed(2);
+  const cy2 = (H/2 + Math.cos(t*0.3)*5).toFixed(2);
+  ctx.fillText(`X: ${cx}  Y: ${cy2}  Z: 0.00`, W/2 + 22, H/2 - 4);
+
+  t += 0.016;
+  requestAnimationFrame(draw);
+}
+
+resize();
+draw();
+</script>
+</body>
+</html>
