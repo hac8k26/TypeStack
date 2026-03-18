@@ -300,7 +300,7 @@ class Module {
     }
 
     // title bar
-    ctx.fillStyle = `rgba(194,113,79,${0.06 + pulse * 0.04})`;
+    ctx.fillStyle = `rgba(100,200,255,${0.06 + pulse * 0.04})`;
     ctx.fillRect(x + 1, y + 1, w - 2, 16);
 
     ctx.fillStyle = C.accent;
@@ -361,8 +361,8 @@ function drawRadar(cx, cy, r, t) {
     ? null
     : (() => {
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        g.addColorStop(0, 'rgba(194,113,79,0.15)');
-        g.addColorStop(1, 'rgba(194,113,79,0)');
+        g.addColorStop(0, 'rgba(100,200,255,0.15)');
+        g.addColorStop(1, 'rgba(100,200,255,0)');
         return g;
       })();
 
@@ -419,7 +419,7 @@ function drawWaveform(x, y, w, h, t) {
   ctx.fillText('SIG / WAVEFORM', x + 4, y - 4);
 
   // baseline
-  ctx.strokeStyle = 'rgba(194,113,79,0.15)';
+  ctx.strokeStyle = 'rgba(100,200,255,0.15)';
   ctx.lineWidth   = 0.5;
   ctx.beginPath();
   ctx.moveTo(x, y + h/2); ctx.lineTo(x + w, y + h/2);
@@ -554,7 +554,7 @@ function draw() {
 
   // border frame
   const pad = 14;
-  ctx.strokeStyle = 'rgba(194,113,79,0.3)';
+  ctx.strokeStyle = 'rgba(100,200,255,0.3)';
   ctx.lineWidth   = 1;
   ctx.strokeRect(pad, pad, W - pad*2, H - pad*2);
 
